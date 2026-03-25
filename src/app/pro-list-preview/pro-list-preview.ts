@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { ProCard } from '../pro-card/pro-card';
+import { PortalUser } from '../model/entities';
 
 @Component({
   selector: 'app-pro-list-preview',
@@ -9,6 +10,6 @@ import { ProCard } from '../pro-card/pro-card';
 })
 export class ProListPreview 
 {
-  portalUser = input.required<PortalUsers[]>();
+  portalUser = input.required<PortalUser[]>();
 
 }

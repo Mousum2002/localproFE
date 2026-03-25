@@ -1,15 +1,26 @@
-<div class="procard w3-row">
+<div class="procard w3-card w3-margin-bottom w3-padding">
 
-    <div class="w3-col s12 m1 l1 idcolumn">
-        <h3 class="w3-teal">{{portalUser().id}}</h3>
+  <div class="w3-row">
+    <div class="w3-col s12 m1 l1">
+      <span class="w3-tag w3-teal">{{ portalUser().id }}</span>
     </div>
+    <div class="w3-col s12 m11 l11">
+      <h4 class="w3-margin-top-0">
+        {{ portalUser().firstName }} {{ portalUser().lastName }}
+      </h4>
+      <p class="w3-text-grey">{{ portalUser().city }} — {{ portalUser().address }}</p>
+      <p>{{ portalUser().bio }}</p>
 
-    <div class="w3-col s12 m8 l8 textcolumn">
-        {{portalUser().firstName}} {{portalUser().lastName}}
+      @if (portalUser().operationProvided?.length) {
+        <div class="w3-margin-top">
+          @for (op of portalUser().operationProvided; track op.id) {
+            <span class="w3-tag w3-blue w3-margin-right">
+              {{ op.operationType?.name }} — {{ op.price }}€
+            </span>
+          }
+        </div>
+      }
     </div>
+  </div>
 
-    <div class="w3-col s12 m8 l8 textcolumn">
-        {{portalUser().tags}}
-    </div>
-        
 </div>

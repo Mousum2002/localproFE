@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { PortalUser } from '../model/entities';
 
 @Component({
   selector: 'app-pro-card',
@@ -7,7 +8,6 @@ import { Component } from '@angular/core';
   templateUrl: './pro-card.html',
   styleUrl: './pro-card.css',
 })
-export class ProCard 
-{
-  @Input() portalUser: any; // Replace 'any' with your actual User interface/type
+export class ProCard {
+  portalUser = input.required<PortalUser>();
 }
