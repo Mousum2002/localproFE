@@ -10,6 +10,7 @@ export interface PortalUser
     bio: string
     x: number;
     y: number;
+    role: 'ADMIN' | 'USER' | 'VENDOR';
     reviews: Review[];
     operationProvided: OperationTypeByVendor[];
 }
