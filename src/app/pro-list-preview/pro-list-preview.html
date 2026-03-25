@@ -1,9 +1,9 @@
 <div class="prolist">
 
-    @for (portalUser of portalUsers(); track portalUser.id)
+    @for (user of portalUser(); track user.id)
     {
         <app-pro-card
-            [portalUser]="portalUser"
+            [portalUser]="user"
             >
         </app-pro-card>
         }
