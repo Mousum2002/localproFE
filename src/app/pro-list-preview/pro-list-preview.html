@@ -1,0 +1,11 @@
+<div class="prolist">
+
+    @for (portalUser of portalUsers(); track portalUser.id)
+    {
+        <app-pro-card
+            [portalUser]="portalUser"
+            >
+        </app-pro-card>
+        }
+
+</div>
