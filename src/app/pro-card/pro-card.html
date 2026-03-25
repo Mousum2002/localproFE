@@ -15,7 +15,7 @@
         <div class="w3-margin-top">
           @for (op of portalUser().operationProvided; track op.id) {
             <span class="w3-tag w3-blue w3-margin-right">
-              {{ op.operationType?.name }} — {{ op.price }}€
+              {{ op.operationType.name }} — {{ op.price }}€
             </span>
           }
         </div>

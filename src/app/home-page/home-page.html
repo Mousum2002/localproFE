@@ -1,0 +1,118 @@
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="badge">🇮🇹 Professionisti locali verificati</div>
+    <h1 class="hero-title">
+      Il professionista giusto,<br>
+      <span class="accent">nel tuo quartiere.</span>
+    </h1>
+    <p class="hero-sub">
+      Trova idraulici, elettricisti, falegnami e molto altro.
+      Confronta prezzi, leggi recensioni e prenota in pochi clic.
+    </p>
+    <div class="hero-actions">
+      <a routerLink="/professionisti" class="btn-primary">Cerca professionisti</a>
+      <a routerLink="/professionisti" class="btn-ghost">Scopri come funziona →</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-number">{{ totalVendors() }}</span>
+        <span class="stat-label">Professionisti</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-number">{{ operationTypes().length }}+</span>
+        <span class="stat-label">Categorie</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-number">100%</span>
+        <span class="stat-label">Verificati</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="floating-card card-1">
+      <span class="card-icon">🔧</span>
+      <span>Idraulico disponibile</span>
+      <span class="card-rating">★ 4.9</span>
+    </div>
+    <div class="floating-card card-2">
+      <span class="card-icon">⚡</span>
+      <span>Elettricista certificato</span>
+      <span class="card-rating">★ 4.8</span>
+    </div>
+    <div class="floating-card card-3">
+      <span class="card-icon">🪵</span>
+      <span>Falegname esperto</span>
+      <span class="card-rating">★ 5.0</span>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIE -->
+<section class="section categories-section">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2>Esplora per categoria</h2>
+      <p>Trova il professionista adatto alla tua esigenza</p>
+    </div>
+
+    <div class="categories-grid">
+      @for (type of operationTypes(); track type.id) {
+        <a routerLink="/professionisti" class="category-card">
+          <div class="category-icon">🛠️</div>
+          <div class="category-name">{{ type.name }}</div>
+          <div class="category-desc">{{ type.description }}...</div>
+          <div class="category-arrow">→</div>
+        </a>
+      }
+      @if (operationTypes().length === 0) {
+        <p class="empty-msg">Caricamento categorie...</p>
+      }
+    </div>
+
+    <div class="section-cta">
+      <a routerLink="/professionisti" class="btn-primary">Vedi tutti i professionisti</a>
+    </div>
+  </div>
+</section>
+
+<!-- COME FUNZIONA -->
+<section class="section how-section">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2>Come funziona</h2>
+      <p>Tre semplici passi per trovare il tuo professionista</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">01</div>
+        <h3>Cerca</h3>
+        <p>Inserisci la tipologia di servizio che cerchi e trova i professionisti nella tua zona.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <h3>Confronta</h3>
+        <p>Leggi recensioni reali, confronta prezzi e profili dei professionisti disponibili.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <h3>Contatta</h3>
+        <p>Mettiti in contatto direttamente col professionista e prenota il servizio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINALE -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <h2>Sei un professionista?</h2>
+    <p>Unisciti a LocalPro e raggiungi nuovi clienti nella tua città.</p>
+    <a routerLink="/professionisti" class="btn-white">Registrati gratuitamente</a>
+  </div>
+</section>

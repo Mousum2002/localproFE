@@ -1,0 +1,388 @@
+/* ── GLOBALS ─────────────────────────────────────────────── */
+:host {
+  --green: #1a7a4a;
+  --green-light: #25a865;
+  --green-pale: #e8f5ee;
+  --dark: #12201a;
+  --text: #2c3e35;
+  --muted: #6b7f74;
+  --border: #d4e6dc;
+  --white: #ffffff;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  display: block;
+}
+
+/* ── HERO ────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  min-height: 92vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 3rem;
+  padding: 6rem 5%;
+  background: var(--dark);
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 70% 50%, rgba(26,122,74,0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 10% 80%, rgba(26,122,74,0.1) 0%, transparent 60%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.badge {
+  display: inline-block;
+  background: rgba(37,168,101,0.15);
+  border: 1px solid rgba(37,168,101,0.3);
+  color: var(--green-light);
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 2rem;
+  letter-spacing: 0.02em;
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1.15;
+  margin: 0 0 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.accent {
+  color: var(--green-light);
+  font-style: italic;
+}
+
+.hero-sub {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+  font-family: 'Courier New', monospace;
+  max-width: 480px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.btn-primary {
+  background: var(--green-light);
+  color: var(--white);
+  padding: 0.85rem 2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.1s;
+  display: inline-block;
+}
+
+.btn-primary:hover {
+  background: var(--green);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  padding: 0.85rem 1.5rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  transition: border-color 0.2s, color 0.2s;
+  display: inline-block;
+}
+
+.btn-ghost:hover {
+  border-color: rgba(255,255,255,0.5);
+  color: var(--white);
+}
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.stat { text-align: left; }
+
+.stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 0.25rem;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,0.15);
+}
+
+/* ── FLOATING CARDS ──────────────────────────────────────── */
+.hero-visual {
+  position: relative;
+  z-index: 2;
+  height: 400px;
+}
+
+.floating-card {
+  position: absolute;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--white);
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  animation: float 4s ease-in-out infinite;
+}
+
+.card-1 { top: 20%;  left: 5%;  animation-delay: 0s; }
+.card-2 { top: 48%;  left: 25%; animation-delay: 1.3s; }
+.card-3 { top: 72%;  left: 8%;  animation-delay: 0.7s; }
+
+.card-icon { font-size: 1.4rem; }
+
+.card-rating {
+  margin-left: auto;
+  padding-left: 1rem;
+  color: #f0c040;
+  font-size: 0.8rem;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+/* ── SECTIONS ────────────────────────────────────────────── */
+.section {
+  padding: 6rem 5%;
+}
+
+.section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.section-header h2 {
+  font-size: 2.2rem;
+  font-weight: 400;
+  color: var(--dark);
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.section-header p {
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+}
+
+/* ── CATEGORIES ──────────────────────────────────────────── */
+.categories-section { background: var(--white); }
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.category-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.75rem;
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  position: relative;
+}
+
+.category-card:hover {
+  border-color: var(--green-light);
+  box-shadow: 0 8px 24px rgba(26,122,74,0.1);
+  transform: translateY(-3px);
+}
+
+.category-icon { font-size: 2rem; margin-bottom: 0.25rem; }
+
+.category-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.category-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.category-arrow {
+  color: var(--green-light);
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+  transition: transform 0.2s;
+}
+
+.category-card:hover .category-arrow { transform: translateX(4px); }
+
+.section-cta { text-align: center; }
+
+.empty-msg {
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+/* ── HOW IT WORKS ────────────────────────────────────────── */
+.how-section { background: var(--green-pale); }
+
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.step {
+  flex: 1;
+  min-width: 220px;
+  max-width: 280px;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: var(--white);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.step-number {
+  font-size: 3rem;
+  font-weight: 400;
+  color: var(--green-light);
+  font-family: 'Georgia', serif;
+  line-height: 1;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.step h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin: 0 0 0.75rem;
+}
+
+.step p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.step-arrow {
+  font-size: 1.5rem;
+  color: var(--green-light);
+  flex-shrink: 0;
+}
+
+/* ── CTA FINALE ──────────────────────────────────────────── */
+.cta-section {
+  background: var(--green);
+  padding: 5rem 5%;
+  text-align: center;
+}
+
+.cta-inner h2 {
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: var(--white);
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+}
+
+.cta-inner p {
+  color: rgba(255,255,255,0.7);
+  font-family: 'Courier New', monospace;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.btn-white {
+  background: var(--white);
+  color: var(--green);
+  padding: 0.85rem 2.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-white:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 4rem 5%;
+  }
+  .hero-visual { display: none; }
+  .steps { flex-direction: column; }
+  .step-arrow { transform: rotate(90deg); }
+}
