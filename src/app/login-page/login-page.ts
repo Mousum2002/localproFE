@@ -5,9 +5,10 @@ import { Auth } from '../auth';
 
 @Component({
   selector: 'app-login-page',
+  standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './login-page.html',
-  styleUrl: './login-page.css',
+  styleUrls: ['./login-page.css'], // plural
 })
 export class LoginPage {
 
@@ -17,7 +18,6 @@ export class LoginPage {
   loading = signal<boolean>(false);
 
   constructor(private auth: Auth, private router: Router) {}
-
 
   login() {
     if (!this.userName || !this.password) {
@@ -31,8 +31,10 @@ export class LoginPage {
     this.auth.login(this.userName, this.password).subscribe({
       next: (users) => {
         this.loading.set(false);
+
         const me = users.find(u => u.userName === this.userName);
         if (me) {
+          this.auth.currentUser.set(me); // salva l’utente loggato
           this.router.navigate(['/']);
         } else {
           this.error.set('Credenziali non valide.');

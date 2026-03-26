@@ -1,25 +1,15 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-
-interface RegisterRequest {
-  userName: string;
-  email: string;
-  password: string;
-  city: string;
-  address: string;
-  bio: string;
-  x: number;
-  y: number;
-  roles: string[];
-}
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-register-page',
-  imports: [FormsModule, RouterLink],
+  standalone: true,
+  imports: [FormsModule, CommonModule],
   templateUrl: './register-page.html',
-  styleUrl: './register-page.css',
+  styleUrls: ['./register-page.css'],
 })
 export class RegisterPage {
 
@@ -29,8 +19,6 @@ export class RegisterPage {
   confirmPassword = '';
   city = '';
   address = '';
-  bio = '';
-  selectedRole: 'USER' | 'VENDOR' = 'USER';
 
   error = signal<string>('');
   loading = signal<boolean>(false);
@@ -55,16 +43,15 @@ export class RegisterPage {
     this.loading.set(true);
     this.error.set('');
 
-    const body: RegisterRequest = {
+    const body = {
       userName: this.userName,
       email: this.email,
       password: this.password,
       city: this.city,
       address: this.address,
-      bio: this.bio,
       x: 0,
       y: 0,
-      roles: [this.selectedRole]
+      roles: ['USER']
     };
 
     this.http.post('http://localhost:8080/public', body).subscribe({

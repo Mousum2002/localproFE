@@ -9,92 +9,68 @@
     <h1 class="register-title">Crea il tuo account</h1>
     <p class="register-sub">Unisciti alla community di professionisti locali</p>
 
-    @if (success()) {
-      <div class="success-msg">
-        ✓ Registrazione completata! Reindirizzamento al login...
-      </div>
-    } @else {
+    <!-- Messaggio di successo -->
+    <div *ngIf="success(); else registrationForm" class="success-msg">
+      ✓ Registrazione completata! Reindirizzamento al login...
+    </div>
 
-      <!-- TIPO ACCOUNT -->
-      <div class="role-selector">
-        <button
-          class="role-btn"
-          [class.active]="selectedRole === 'USER'"
-          (click)="selectedRole = 'USER'">
-          👤 Sono un cliente
-        </button>
-        <button
-          class="role-btn"
-          [class.active]="selectedRole === 'VENDOR'"
-          (click)="selectedRole = 'VENDOR'">
-          🔧 Sono un professionista
-        </button>
-      </div>
-
-      <!-- CAMPI OBBLIGATORI -->
+    <!-- Form di registrazione -->
+    <ng-template #registrationForm>
       <div class="section-label">Dati obbligatori</div>
 
       <div class="form-group">
         <label class="form-label">Username *</label>
         <input class="form-input" type="text" placeholder="scegli un username"
-          [(ngModel)]="userName" />
+               [(ngModel)]="userName" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Email *</label>
         <input class="form-input" type="email" placeholder="tua@email.com"
-          [(ngModel)]="email" />
+               [(ngModel)]="email" />
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Password *</label>
           <input class="form-input" type="password" placeholder="min. 8 caratteri"
-            [(ngModel)]="password" />
+                 [(ngModel)]="password" />
         </div>
         <div class="form-group">
           <label class="form-label">Conferma password *</label>
           <input class="form-input" type="password" placeholder="ripeti la password"
-            [(ngModel)]="confirmPassword" />
+                 [(ngModel)]="confirmPassword" />
         </div>
       </div>
 
-      <!-- CAMPI OPZIONALI -->
       <div class="section-label">Dati opzionali</div>
 
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Città</label>
           <input class="form-input" type="text" placeholder="es. Roma"
-            [(ngModel)]="city" />
+                 [(ngModel)]="city" />
         </div>
         <div class="form-group">
           <label class="form-label">Indirizzo</label>
           <input class="form-input" type="text" placeholder="es. Via Roma 1"
-            [(ngModel)]="address" />
+                 [(ngModel)]="address" />
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Bio</label>
-        <textarea class="form-input form-textarea"
-          placeholder="Descriviti brevemente..."
-          [(ngModel)]="bio"></textarea>
-      </div>
+      <!-- Messaggio di errore -->
+      <div *ngIf="error()" class="error-msg">{{ error() }}</div>
 
-      @if (error()) {
-        <div class="error-msg">{{ error() }}</div>
-      }
-
+      <!-- Bottone di registrazione -->
       <button class="btn-register" (click)="register()" [disabled]="loading()">
-        @if (loading()) { Registrazione in corso... }
-        @else { Crea account }
+        <span *ngIf="loading(); else btnText">Registrazione in corso...</span>
+        <ng-template #btnText>Crea account</ng-template>
       </button>
 
       <p class="login-link">
         Hai già un account? <a routerLink="/login">Accedi</a>
       </p>
-    }
+    </ng-template>
 
   </div>
 </div>
