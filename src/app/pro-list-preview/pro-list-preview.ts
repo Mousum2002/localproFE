@@ -32,7 +32,7 @@ export class ProListPreview implements OnInit {
     });
 
     // carica le tipologie per il filtro
-    this.http.get<OperationType[]>('http://localhost:8080/operationtype')
+    this.http.get<OperationType[]>('http://localhost:8080/operation-types')
       .subscribe(types => this.operationTypes.set(types));
   }
 
