@@ -8,7 +8,7 @@ import { map, Observable, of, tap } from 'rxjs';
 })
 export class UserService {
     private http = inject(HttpClient);
-    private apiUrl = 'https://localhost:8080/api/users';
+    private apiUrl = 'http://localhost:8080/api/users';
     private _allUsers: PortalUser[] | null = null;
 
     public getAllUsers(): Observable<PortalUser[]> {

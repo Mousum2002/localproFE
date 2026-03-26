@@ -1,4 +1,4 @@
-export interface PortalUser 
+export interface PortalUser
 {
     id?: number;
     firstName: string;

@@ -1,0 +1,50 @@
+<div class="login-wrapper">
+
+  <div class="login-card">
+
+    <div class="login-brand">
+      <span class="brand-dot"></span>
+      <span class="brand-name">LocalPro</span>
+    </div>
+
+    <h1 class="login-title">Bentornato</h1>
+    <p class="login-sub">Accedi al tuo account per continuare</p>
+
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input
+        class="form-input"
+        type="text"
+        placeholder="Il tuo username"
+        [(ngModel)]="userName"
+        (keyup.enter)="login()"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input
+        class="form-input"
+        type="password"
+        placeholder="••••••••"
+        [(ngModel)]="password"
+        (keyup.enter)="login()"
+      />
+    </div>
+
+    @if (error()) {
+      <div class="error-msg">{{ error() }}</div>
+    }
+
+    <button class="btn-login" (click)="login()" [disabled]="loading()">
+      @if (loading()) { Accesso in corso... }
+      @else { Accedi }
+    </button>
+
+    <p class="register-link">
+      Non hai un account? <a routerLink="/register">Registrati</a>
+    </p>
+
+  </div>
+
+</div>

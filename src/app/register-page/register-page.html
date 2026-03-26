@@ -1,0 +1,100 @@
+<div class="register-wrapper">
+  <div class="register-card">
+
+    <div class="login-brand">
+      <span class="brand-dot"></span>
+      <span class="brand-name">LocalPro</span>
+    </div>
+
+    <h1 class="register-title">Crea il tuo account</h1>
+    <p class="register-sub">Unisciti alla community di professionisti locali</p>
+
+    @if (success()) {
+      <div class="success-msg">
+        ✓ Registrazione completata! Reindirizzamento al login...
+      </div>
+    } @else {
+
+      <!-- TIPO ACCOUNT -->
+      <div class="role-selector">
+        <button
+          class="role-btn"
+          [class.active]="selectedRole === 'USER'"
+          (click)="selectedRole = 'USER'">
+          👤 Sono un cliente
+        </button>
+        <button
+          class="role-btn"
+          [class.active]="selectedRole === 'VENDOR'"
+          (click)="selectedRole = 'VENDOR'">
+          🔧 Sono un professionista
+        </button>
+      </div>
+
+      <!-- CAMPI OBBLIGATORI -->
+      <div class="section-label">Dati obbligatori</div>
+
+      <div class="form-group">
+        <label class="form-label">Username *</label>
+        <input class="form-input" type="text" placeholder="scegli un username"
+          [(ngModel)]="userName" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input class="form-input" type="email" placeholder="tua@email.com"
+          [(ngModel)]="email" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <input class="form-input" type="password" placeholder="min. 8 caratteri"
+            [(ngModel)]="password" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Conferma password *</label>
+          <input class="form-input" type="password" placeholder="ripeti la password"
+            [(ngModel)]="confirmPassword" />
+        </div>
+      </div>
+
+      <!-- CAMPI OPZIONALI -->
+      <div class="section-label">Dati opzionali</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Città</label>
+          <input class="form-input" type="text" placeholder="es. Roma"
+            [(ngModel)]="city" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Indirizzo</label>
+          <input class="form-input" type="text" placeholder="es. Via Roma 1"
+            [(ngModel)]="address" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bio</label>
+        <textarea class="form-input form-textarea"
+          placeholder="Descriviti brevemente..."
+          [(ngModel)]="bio"></textarea>
+      </div>
+
+      @if (error()) {
+        <div class="error-msg">{{ error() }}</div>
+      }
+
+      <button class="btn-register" (click)="register()" [disabled]="loading()">
+        @if (loading()) { Registrazione in corso... }
+        @else { Crea account }
+      </button>
+
+      <p class="login-link">
+        Hai già un account? <a routerLink="/login">Accedi</a>
+      </p>
+    }
+
+  </div>
+</div>
