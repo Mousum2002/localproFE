@@ -1,0 +1,137 @@
+<div class="admin-container">
+
+  <!-- ── Header ─────────────────────────────────────── -->
+  <div class="admin-header-card">
+    <div class="admin-header-left">
+      <span class="admin-icon">⚙</span>
+      <div>
+        <h1 class="admin-title">Admin Dashboard</h1>
+        <p class="admin-sub">Gestione utenti del portale</p>
+      </div>
+    </div>
+    <button class="btn-back" (click)="goBack()">← Torna al profilo</button>
+  </div>
+
+  <!-- ── Stats ───────────────────────────────────────── -->
+  <div class="stats-row">
+    <div class="stat-chip">
+      <span class="stat-value">{{ users.length }}</span>
+      <span class="stat-label">Utenti totali</span>
+    </div>
+    <div class="stat-chip stat-chip--active">
+      <span class="stat-value">{{ activeUsers.length }}</span>
+      <span class="stat-label">Utenti attivi</span>
+    </div>
+    <div class="stat-chip stat-chip--banned">
+      <span class="stat-value">{{ bannedUsers.length }}</span>
+      <span class="stat-label">Utenti bannati</span>
+    </div>
+  </div>
+
+  <!-- ── Error / Loading ─────────────────────────────── -->
+  <p class="msg-error" *ngIf="error()">{{ error() }}</p>
+  <div class="loading-bar" *ngIf="loading()">
+    <div class="loading-bar-inner"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       LISTE AFFIANCATE
+       ══════════════════════════════════════════════════ -->
+  <div class="lists-grid">
+
+    <!-- ── Lista: tutti gli utenti ─────────────────── -->
+    <div class="list-card">
+      <h2 class="list-title">Tutti gli utenti</h2>
+
+      <div class="search-group">
+        <label class="search-label">Cerca utente</label>
+        <input
+          class="search-input"
+          type="text"
+          placeholder="Nome, email o username…"
+          [(ngModel)]="searchAll"
+        />
+      </div>
+
+      <div class="user-list">
+        <div
+          class="user-row"
+          *ngFor="let u of filteredUsers"
+          [class.user-row--banned]="u.isBanned"
+        >
+          <!-- Avatar -->
+          <div class="user-avatar-sm" [class.user-avatar-sm--banned]="u.isBanned">
+            <img *ngIf="u.profileImage" [src]="u.profileImage" [alt]="u.userName" />
+            <span *ngIf="!u.profileImage" class="initials-sm">{{ getInitials(u) }}</span>
+          </div>
+
+          <!-- Info -->
+          <div class="user-info">
+            <span class="user-name">{{ u.firstName || '' }} {{ u.lastName || '' }}</span>
+            <span class="user-email">{{ u.email }}</span>
+            <span class="user-handle">@{{ u.userName }}</span>
+          </div>
+
+          <!-- Badge + azione -->
+          <div class="user-aside">
+            <span class="badge-admin" *ngIf="hasRole(u, 'ADMIN')">Admin</span>
+            <span class="badge-banned" *ngIf="u.isBanned">Bannato</span>
+            <span class="badge-user"   *ngIf="!u.isBanned && !hasRole(u, 'ADMIN')">● Attivo</span>
+            <button class="btn-ban"   *ngIf="!u.isBanned" (click)="banUser(u)">Ban</button>
+            <button class="btn-unban" *ngIf="u.isBanned"  (click)="unbanUser(u)">Unban</button>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="filteredUsers.length === 0 && !loading()">
+          Nessun utente trovato
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Lista: utenti bannati ────────────────────── -->
+    <div class="list-card list-card--banned">
+      <h2 class="list-title">Utenti bannati</h2>
+
+      <div class="search-group">
+        <label class="search-label">Cerca bannato</label>
+        <input
+          class="search-input"
+          type="text"
+          placeholder="Nome, email o username…"
+          [(ngModel)]="searchBanned"
+        />
+      </div>
+
+      <div class="user-list">
+        <div
+          class="user-row user-row--banned"
+          *ngFor="let u of filteredBanned"
+        >
+          <!-- Avatar -->
+          <div class="user-avatar-sm user-avatar-sm--banned">
+            <img *ngIf="u.profileImage" [src]="u.profileImage" [alt]="u.userName" />
+            <span *ngIf="!u.profileImage" class="initials-sm">{{ getInitials(u) }}</span>
+          </div>
+
+          <!-- Info -->
+          <div class="user-info">
+            <span class="user-name">{{ u.firstName || '' }} {{ u.lastName || '' }}</span>
+            <span class="user-email">{{ u.email }}</span>
+            <span class="user-handle">@{{ u.userName }}</span>
+          </div>
+
+          <!-- Badge + azione -->
+          <div class="user-aside">
+            <span class="badge-banned">Bannato</span>
+            <button class="btn-unban" (click)="unbanUser(u)">Unban</button>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="filteredBanned.length === 0 && !loading()">
+          Nessun utente bannato 
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /lists-grid -->
+</div>

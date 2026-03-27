@@ -4,6 +4,7 @@ import { ProListPreview } from './pro-list-preview/pro-list-preview';
 import { LoginPage } from './login-page/login-page';
 import { RegisterPage } from './register-page/register-page';
 import { ProfilePage } from './profile-page/profile-page';
+import { AdminPage } from './admin-page/admin-page';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegisterPage },
   { path: 'profilo', component: ProfilePage },
+  { path: 'admin', component: AdminPage },
   { path: '**', redirectTo: '' },
 ];

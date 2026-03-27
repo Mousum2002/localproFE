@@ -1,0 +1,391 @@
+/* ═══════════════════════════════════════════════
+   ADMIN PAGE — same design system as profile-page
+   ═══════════════════════════════════════════════ */
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #0d1a14;
+  padding: 2rem 1rem;
+}
+
+.admin-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Header card — mirrors .profile-header-card ── */
+.admin-header-card {
+  background: #12201a;
+  border: 1px solid rgba(37, 168, 101, 0.15);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.admin-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.admin-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  color: #ffc107;
+}
+
+.admin-title {
+  font-family: 'Georgia', serif;
+  font-size: 1.5rem;
+  color: white;
+  margin: 0;
+}
+
+.admin-sub {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0.2rem 0 0;
+}
+
+/* ── Back button — ghost variant of .btn-save ── */
+.btn-back {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.65rem 1.1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-back:hover {
+  color: #25a865;
+  border-color: rgba(37, 168, 101, 0.35);
+}
+
+/* ── Stats row ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.stat-chip {
+  background: #12201a;
+  border: 1px solid rgba(37, 168, 101, 0.15);
+  border-radius: 16px;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.stat-chip--banned { border-color: rgba(255, 107, 122, 0.22); }
+.stat-chip--active { border-color: rgba(37, 168, 101, 0.22); }
+
+.stat-value {
+  font-family: 'Georgia', serif;
+  font-size: 2rem;
+  color: white;
+  line-height: 1;
+}
+.stat-chip--banned .stat-value { color: #ff6b7a; }
+.stat-chip--active .stat-value { color: #25a865; }
+
+.stat-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Messages — exact copy from profile-page ── */
+.msg-error {
+  background: rgba(255, 107, 122, 0.1);
+  border: 1px solid rgba(255, 107, 122, 0.3);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  color: #ff6b7a;
+  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
+  margin: 0;
+}
+
+/* ── Loading bar ── */
+.loading-bar {
+  height: 3px;
+  background: rgba(37, 168, 101, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.loading-bar-inner {
+  height: 100%;
+  width: 35%;
+  background: #25a865;
+  border-radius: 2px;
+  animation: bar-slide 1.2s ease-in-out infinite;
+}
+@keyframes bar-slide {
+  0%   { transform: translateX(-150%); }
+  100% { transform: translateX(420%); }
+}
+
+/* ══════════════════════════════════════════════
+   Two lists — SIDE BY SIDE — same .form-card look
+   ══════════════════════════════════════════════ */
+.lists-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ── List card — mirrors .form-card exactly ── */
+.list-card {
+  background: #12201a;
+  border: 1px solid rgba(37, 168, 101, 0.15);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.list-card--banned { border-color: rgba(255, 107, 122, 0.18); }
+
+/* ── List title — mirrors .form-title ── */
+.list-title {
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  color: white;
+  margin: 0 0 0.5rem;
+}
+
+/* ── Search group — mirrors .form-group ── */
+.search-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.search-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Search input — mirrors .form-group input ── */
+.search-input {
+  background: #0d1a14;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  color: white;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.search-input:focus {
+  outline: none;
+  border-color: #25a865;
+}
+.list-card--banned .search-input:focus { border-color: #ff6b7a; }
+.search-input::placeholder { color: rgba(255, 255, 255, 0.2); }
+
+/* ── Scrollable user list ── */
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 460px;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+.user-list::-webkit-scrollbar { width: 4px; }
+.user-list::-webkit-scrollbar-track { background: transparent; }
+.user-list::-webkit-scrollbar-thumb {
+  background: rgba(37, 168, 101, 0.2);
+  border-radius: 2px;
+}
+.list-card--banned .user-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 122, 0.2);
+}
+
+/* ── User row ── */
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.75rem 0.85rem;
+  background: #0d1a14;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+.user-row:hover { border-color: rgba(37, 168, 101, 0.25); }
+.user-row--banned { border-color: rgba(255, 107, 122, 0.12); }
+.user-row--banned:hover { border-color: rgba(255, 107, 122, 0.28); }
+
+/* ── Avatar sm — mirrors .avatar ── */
+.user-avatar-sm {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1e3328;
+  border: 2px solid #25a865;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.user-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+.user-avatar-sm--banned { border-color: #ff6b7a; background: rgba(255, 107, 122, 0.08); }
+
+/* ── Initials — mirrors .initials ── */
+.initials-sm {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #25a865;
+  font-family: 'Georgia', serif;
+}
+.user-avatar-sm--banned .initials-sm { color: #ff6b7a; }
+
+/* ── User info text ── */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  flex: 1;
+  min-width: 0;
+}
+.user-name {
+  font-family: 'Georgia', serif;
+  font-size: 0.9rem;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-email {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-handle {
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  color: rgba(37, 168, 101, 0.55);
+}
+
+/* ── Badges — exact copy from profile-page ── */
+.badge-admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  background: rgba(255, 193, 7, 0.12);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #ffc107;
+  font-family: 'Courier New', monospace;
+  width: fit-content;
+}
+.badge-user {
+  display: inline-flex;
+  padding: 0.25rem 0.7rem;
+  background: rgba(37, 168, 101, 0.1);
+  border: 1px solid rgba(37, 168, 101, 0.25);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #25a865;
+  font-family: 'Courier New', monospace;
+  width: fit-content;
+}
+.badge-banned {
+  display: inline-flex;
+  padding: 0.25rem 0.7rem;
+  background: rgba(255, 107, 122, 0.1);
+  border: 1px solid rgba(255, 107, 122, 0.28);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #ff6b7a;
+  font-family: 'Courier New', monospace;
+  width: fit-content;
+}
+
+/* ── Right side: badge + button stacked ── */
+.user-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+/* ── Action buttons — same style as .btn-save ── */
+.btn-ban {
+  background: rgba(255, 107, 122, 0.1);
+  color: #ff6b7a;
+  border: 1px solid rgba(255, 107, 122, 0.3);
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-ban:hover { background: rgba(255, 107, 122, 0.2); }
+
+.btn-unban {
+  background: rgba(37, 168, 101, 0.1);
+  color: #25a865;
+  border: 1px solid rgba(37, 168, 101, 0.28);
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-unban:hover { background: rgba(37, 168, 101, 0.2); }
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .lists-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 540px) {
+  .admin-header-card { flex-direction: column; align-items: flex-start; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .stat-chip:last-child { grid-column: span 2; }
+}

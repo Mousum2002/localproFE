@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Auth } from '../auth';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile-page',
@@ -24,7 +25,7 @@ export class ProfilePage implements OnInit {
 
   private apiUrl = 'http://localhost:8080/api/users';
 
-  constructor(public auth: Auth, private http: HttpClient) {}
+  constructor(public auth: Auth, private http: HttpClient, private router: Router) {}
 
   ngOnInit() {
     const user = this.auth.currentUser();
@@ -104,4 +105,9 @@ export class ProfilePage implements OnInit {
     const roles = this.auth.currentUser()?.roles ?? [];
     return roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
   }
+
+  goToAdmin() {
+    this.router.navigate(['/admin']);
+    }
+
 }
