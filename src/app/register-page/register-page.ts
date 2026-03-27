@@ -3,11 +3,13 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { first } from 'rxjs';
 
 @Component({
   selector: 'app-register-page',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterLink],
   templateUrl: './register-page.html',
   styleUrls: ['./register-page.css'],
 })
@@ -23,6 +25,8 @@ export class RegisterPage {
   error = signal<string>('');
   loading = signal<boolean>(false);
   success = signal<boolean>(false);
+  firstName: any;
+  lastName: any;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -49,12 +53,13 @@ export class RegisterPage {
       password: this.password,
       city: this.city,
       address: this.address,
+      firstName: this.firstName,
+      lastName: this.lastName,
       x: 0,
       y: 0,
-      roles: ['USER']
     };
 
-    this.http.post('http://localhost:8080/public', body).subscribe({
+    this.http.post('http://localhost:8080/public/register', body).subscribe({
       next: () => {
         this.loading.set(false);
         this.success.set(true);

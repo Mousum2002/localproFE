@@ -9,67 +9,126 @@
     <h1 class="register-title">Crea il tuo account</h1>
     <p class="register-sub">Unisciti alla community di professionisti locali</p>
 
-    <!-- Messaggio di successo -->
+    <!-- SUCCESS -->
     <div *ngIf="success(); else registrationForm" class="success-msg">
       ✓ Registrazione completata! Reindirizzamento al login...
     </div>
 
-    <!-- Form di registrazione -->
+    <!-- FORM -->
     <ng-template #registrationForm>
+
       <div class="section-label">Dati obbligatori</div>
 
+      <!-- Nome e Cognome -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nome</label>
+          <input class="form-input"
+                 type="text"
+                 name="firstName"
+                 placeholder="es. Mario"
+                 [(ngModel)]="firstName" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cognome</label>
+          <input class="form-input"
+                 type="text"
+                 name="lastName"
+                 placeholder="es. Rossi"
+                 [(ngModel)]="lastName" />
+        </div>
+      </div>
+
+      <!-- Username -->
       <div class="form-group">
         <label class="form-label">Username *</label>
-        <input class="form-input" type="text" placeholder="scegli un username"
+        <input class="form-input"
+               type="text"
+               name="userName"
+               placeholder="scegli un username"
                [(ngModel)]="userName" />
       </div>
 
+      <!-- Email -->
       <div class="form-group">
         <label class="form-label">Email *</label>
-        <input class="form-input" type="email" placeholder="tua@email.com"
+        <input class="form-input"
+               type="email"
+               name="email"
+               placeholder="tua@email.com"
                [(ngModel)]="email" />
       </div>
 
+      <!-- Password -->
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Password *</label>
-          <input class="form-input" type="password" placeholder="min. 8 caratteri"
+          <input class="form-input"
+                 type="password"
+                 name="password"
+                 placeholder="min. 8 caratteri"
                  [(ngModel)]="password" />
         </div>
+
         <div class="form-group">
           <label class="form-label">Conferma password *</label>
-          <input class="form-input" type="password" placeholder="ripeti la password"
+          <input class="form-input"
+                 type="password"
+                 name="confirmPassword"
+                 placeholder="ripeti la password"
                  [(ngModel)]="confirmPassword" />
         </div>
       </div>
 
       <div class="section-label">Dati opzionali</div>
 
+      <!-- Città e indirizzo -->
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Città</label>
-          <input class="form-input" type="text" placeholder="es. Roma"
+          <input class="form-input"
+                 type="text"
+                 name="city"
+                 placeholder="es. Roma"
                  [(ngModel)]="city" />
         </div>
+
         <div class="form-group">
           <label class="form-label">Indirizzo</label>
-          <input class="form-input" type="text" placeholder="es. Via Roma 1"
+          <input class="form-input"
+                 type="text"
+                 name="address"
+                 placeholder="es. Via Roma 1"
                  [(ngModel)]="address" />
         </div>
       </div>
 
-      <!-- Messaggio di errore -->
-      <div *ngIf="error()" class="error-msg">{{ error() }}</div>
+      <!-- ERRORE -->
+      <div *ngIf="error()" class="error-msg">
+        {{ error() }}
+      </div>
 
-      <!-- Bottone di registrazione -->
-      <button class="btn-register" (click)="register()" [disabled]="loading()">
-        <span *ngIf="loading(); else btnText">Registrazione in corso...</span>
-        <ng-template #btnText>Crea account</ng-template>
+      <!-- BOTTONE -->
+      <button class="btn-register"
+              (click)="register()"
+              [disabled]="loading()">
+
+        <span *ngIf="loading(); else btnText">
+          Registrazione in corso...
+        </span>
+
+        <ng-template #btnText>
+          Crea account
+        </ng-template>
       </button>
 
+      <!-- LINK LOGIN -->
       <p class="login-link">
-        Hai già un account? <a routerLink="/login">Accedi</a>
+        Hai già un account?
+        <a routerLink="/login">Accedi</a>
       </p>
+
     </ng-template>
 
   </div>

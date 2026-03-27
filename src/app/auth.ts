@@ -11,9 +11,9 @@ export interface LoggedUser {
   city: string;
   address: string;
   bio: string;
-  firstName: string;    // aggiunto
-  lastName: string;     // aggiunto
-  profileImage: string; // aggiunto
+  firstName: string;
+  lastName: string;
+  profileImage: string;
   x: number;
   y: number;
 }
@@ -28,30 +28,34 @@ export class Auth {
   currentUser = signal<LoggedUser | null>(null);
   isLoggedIn  = signal<boolean>(false);
 
-  private buildAuthHeader(username: string, password: string): HttpHeaders {
-    const encoded = btoa(`${username}:${password}`);
-    return new HttpHeaders({ Authorization: `Basic ${encoded}` });
-  }
+  login(userName: string, password: string): Observable<any> {
+    const body = new URLSearchParams();
+    body.set('username', userName);
+    body.set('password', password);
 
-  login(userName: string, password: string): Observable<LoggedUser[]> {
-    const headers = this.buildAuthHeader(userName, password);
-    return this.http.get<LoggedUser[]>(`${this.apiUrl}/public`, { headers }).pipe(
-      tap(users => {
-        const me = users.find(u => u.userName === userName);
-        if (me) {
-          this.currentUser.set(me);
-          this.isLoggedIn.set(true);
-          sessionStorage.setItem('auth', btoa(`${userName}:${password}`));
-          sessionStorage.setItem('user', JSON.stringify(me));
-        }
+    return this.http.post(`${this.apiUrl}/api/auth/login`, body.toString(), {
+      headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
+      withCredentials: true
+    }).pipe(
+      tap(() => {
+        this.isLoggedIn.set(true);
+        this.http.get<any[]>(`${this.apiUrl}/public`, { withCredentials: true })
+          .subscribe(users => {
+            const me = users.find((u: any) => u.userName === userName);
+            if (me) {
+              this.currentUser.set(me);
+              sessionStorage.setItem('user', JSON.stringify(me));
+            }
+          });
       })
     );
   }
 
   logout() {
+    this.http.post(`${this.apiUrl}/api/auth/logout`, {}, { withCredentials: true })
+      .subscribe();
     this.currentUser.set(null);
     this.isLoggedIn.set(false);
-    sessionStorage.removeItem('auth');
     sessionStorage.removeItem('user');
     this.router.navigate(['/login']);
   }

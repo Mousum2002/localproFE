@@ -29,10 +29,10 @@ export class ProfilePage implements OnInit {
   ngOnInit() {
     const user = this.auth.currentUser();
     if (user) {
-      this.firstName = (user as any).firstName ?? '';
-      this.lastName  = (user as any).lastName  ?? '';
+      this.firstName = user.firstName ?? '';
+      this.lastName  = user.lastName  ?? '';
       this.bio       = user.bio ?? '';
-      this.profileImageUrl = (user as any).profileImage ?? '';
+      this.profileImageUrl = user.profileImage ?? '';
     }
   }
 
@@ -71,37 +71,35 @@ export class ProfilePage implements OnInit {
       profileImage: this.previewUrl ?? this.profileImageUrl,
     };
 
-    this.http
-      .put(`${this.apiUrl}/${user.id}`, body, {
-        headers: this.auth.getAuthHeader(),
-      })
-      .subscribe({
-        next: (updated: any) => {
-          this.loading.set(false);
-          this.success.set(true);
-          const newUser = {
-            ...user,
-            bio:          updated.bio,
-            firstName:    updated.firstName,
-            lastName:     updated.lastName,
-            profileImage: updated.profileImage,
-          };
-          this.auth.currentUser.set(newUser);
-          sessionStorage.setItem('user', JSON.stringify(newUser));
-          setTimeout(() => this.success.set(false), 3000);
-        },
-        error: () => {
-          this.loading.set(false);
-          this.error.set('Salvataggio fallito. Riprova.');
-        },
-      });
+    this.http.put(`${this.apiUrl}/${user.id}`, body, {
+      withCredentials: true
+    }).subscribe({
+      next: (updated: any) => {
+        this.loading.set(false);
+        this.success.set(true);
+        const newUser = {
+          ...user,
+          bio:          updated.bio,
+          firstName:    updated.firstName,
+          lastName:     updated.lastName,
+          profileImage: updated.profileImage,
+        };
+        this.auth.currentUser.set(newUser);
+        sessionStorage.setItem('user', JSON.stringify(newUser));
+        setTimeout(() => this.success.set(false), 3000);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set('Salvataggio fallito. Riprova.');
+      },
+    });
   }
 
   get initials(): string {
-  const f = this.firstName?.[0]?.toUpperCase() ?? '';
-  const l = this.lastName?.[0]?.toUpperCase()  ?? '';
-  return (f + l) || this.auth.currentUser()?.userName?.[0]?.toUpperCase() || '?';
-}
+    const f = this.firstName?.[0]?.toUpperCase() ?? '';
+    const l = this.lastName?.[0]?.toUpperCase()  ?? '';
+    return (f + l) || this.auth.currentUser()?.userName?.[0]?.toUpperCase() || '?';
+  }
 
   get isAdmin(): boolean {
     return this.auth.currentUser()?.roles?.includes('ROLE_ADMIN') ?? false;

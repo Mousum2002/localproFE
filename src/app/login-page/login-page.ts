@@ -32,7 +32,7 @@ export class LoginPage {
       next: (users) => {
         this.loading.set(false);
 
-        const me = users.find(u => u.userName === this.userName);
+        const me = users.find((u: any) => u.userName === this.userName);
         if (me) {
           this.auth.currentUser.set(me); // salva l’utente loggato
           this.router.navigate(['/']);
