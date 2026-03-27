@@ -65,7 +65,6 @@ export class ProfilePage implements OnInit {
       bio:          this.bio,
       city:         user.city    ?? '',
       address:      user.address ?? '',
-      roles:        user.roles,
       x:            user.x ?? 0,
       y:            user.y ?? 0,
       profileImage: this.previewUrl ?? this.profileImageUrl,

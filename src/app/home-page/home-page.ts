@@ -17,12 +17,14 @@ export class HomePage implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.http.get<OperationType[]>('http://localhost:8080/operationtype')
-      .subscribe(types => this.operationTypes.set(types.slice(0, 6)));
+  this.http.get<OperationType[]>('http://localhost:8080/api/operation-types')
+    .subscribe(types => this.operationTypes.set(types.slice(0, 6)));
 
-    this.http.get<any[]>('http://localhost:8080/portaluser')
-      .subscribe(users => {
-        this.totalVendors.set(users.filter(u => u.role === 'VENDOR').length);
-      });
-  }
+  this.http.get<any[]>('http://localhost:8080/public')
+    .subscribe(users => {
+      this.totalVendors.set(users.filter(u =>
+        !u.roles?.includes('ADMIN') && !u.roles?.includes('ROLE_ADMIN')
+      ).length);
+    });
+}
 }

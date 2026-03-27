@@ -27,27 +27,34 @@ export class ProListPreview implements OnInit {
 
   ngOnInit() {
     this.loadUsers();
-    this.http.get<OperationType[]>('http://localhost:8080/operationtype')
+    this.http.get<OperationType[]>('http://localhost:8080/api/operation-types')
       .subscribe(types => this.operationTypes.set(types));
   }
 
-    loadUsers() 
-    {
-      this.http.get<any[]>('http://localhost:8080/public')
-        .subscribe(users => {
-          const currentRoles = this.auth.currentUser()?.roles ?? [];
-          const isAdmin = currentRoles.includes('ADMIN') || currentRoles.includes('ROLE_ADMIN');
+      loadUsers() {
+  this.http.get<any[]>('http://localhost:8080/public')
+    .subscribe(users => {
+      const currentRoles = this.auth.currentUser()?.roles ?? [];
+      const isAdmin = currentRoles.includes('ADMIN') || currentRoles.includes('ROLE_ADMIN');
 
-          const filtered = isAdmin
-            ? users  // admin vede tutti
-            : users.filter(u =>
-                !u.roles?.includes('ADMIN') && !u.roles?.includes('ROLE_ADMIN')
-              ); // user vede solo altri user
+      console.log('ruoli utente loggato:', currentRoles); // ← per debug
+      console.log('è admin:', isAdmin);
+      console.log('ruoli primo utente lista:', users[0]?.roles); // ← vedi come sono salvati
 
-          this.allUsers.set(filtered);
-          this.filteredUsers.set(filtered);
-        });
-  }
+      const filtered = isAdmin
+        ? users.filter(u =>  // admin vede tutti TRANNE se stesso
+            u.id !== this.auth.currentUser()?.id
+          )
+        : users.filter(u =>  // user vede solo altri user non bannati
+            !u.roles?.includes('ADMIN') &&
+            !u.roles?.includes('ROLE_ADMIN') &&
+            !u.isBanned
+          );
+
+      this.allUsers.set(filtered);
+      this.filteredUsers.set(filtered);
+    });
+}
 
   filterByType() {
     if (!this.selectedTypeId) {

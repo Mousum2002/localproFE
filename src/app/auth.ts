@@ -33,17 +33,24 @@ export class Auth {
     body.set('username', userName);
     body.set('password', password);
 
-    return this.http.post(`${this.apiUrl}/api/auth/login`, body.toString(), {
-      headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
-      withCredentials: true
-    }).pipe(
+    return this.http.post(
+      `${this.apiUrl}/api/auth/login`,
+      body.toString(),
+      {
+        headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
+        withCredentials: true
+      }
+    ).pipe(
       tap(() => {
-        this.isLoggedIn.set(true);
+        // dopo il login carichiamo i dati completi dell'utente
         this.http.get<any[]>(`${this.apiUrl}/public`, { withCredentials: true })
           .subscribe(users => {
             const me = users.find((u: any) => u.userName === userName);
+            console.log('utente trovato:', me);
+            console.log('ruoli:', me?.roles);
             if (me) {
               this.currentUser.set(me);
+              this.isLoggedIn.set(true);
               sessionStorage.setItem('user', JSON.stringify(me));
             }
           });
@@ -74,8 +81,7 @@ export class Auth {
   }
 
   get isAdmin(): boolean {
-  const roles = this.currentUser()?.roles ?? [];
-  return roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
+    const roles = this.currentUser()?.roles ?? [];
+    return roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
   }
-
 }
