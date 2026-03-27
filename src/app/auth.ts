@@ -72,4 +72,10 @@ export class Auth {
     const encoded = sessionStorage.getItem('auth');
     return new HttpHeaders({ Authorization: `Basic ${encoded}` });
   }
+
+  get isAdmin(): boolean {
+  const roles = this.currentUser()?.roles ?? [];
+  return roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
+  }
+
 }

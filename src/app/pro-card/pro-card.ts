@@ -1,13 +1,18 @@
-import { Component, input } from '@angular/core';
-import { PortalUser } from '../model/entities';
+import { Component, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-pro-card',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './pro-card.html',
   styleUrl: './pro-card.css',
 })
 export class ProCard {
-  portalUser = input.required<PortalUser>();
+  portalUser = input.required<any>();
+  isAdmin    = input<boolean>(false);
+
+  onBan    = output<number>();
+  onUnban  = output<number>();
+  onDelete = output<number>();
 }

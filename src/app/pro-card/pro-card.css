@@ -1,0 +1,6 @@
+.banned { opacity: 0.5; border-left: 4px solid red; }
+.username-muted { font-size: 0.85rem; color: #888; font-weight: 400; }
+.admin-actions { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 0.5rem; }
+.btn-ban    { background: #ff9800; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+.btn-unban  { background: #4caf50; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+.btn-delete { background: #f44336; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }    

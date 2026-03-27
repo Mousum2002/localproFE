@@ -102,6 +102,7 @@ export class ProfilePage implements OnInit {
   }
 
   get isAdmin(): boolean {
-    return this.auth.currentUser()?.roles?.includes('ROLE_ADMIN') ?? false;
+    const roles = this.auth.currentUser()?.roles ?? [];
+    return roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
   }
 }
