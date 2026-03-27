@@ -1,45 +1,68 @@
-<div class="procard w3-card w3-margin-bottom w3-padding"
-     [class.banned]="portalUser().isBanned">
+<div class="card" [class.card-banned]="portalUser().isBanned">
 
-  <div class="w3-row">
-    <div class="w3-col s12 m1 l1">
-      <span class="w3-tag w3-teal">{{ portalUser().id }}</span>
-    </div>
-
-    <div class="w3-col s12 m9 l9">
-      <h4 class="w3-margin-top-0">
-        {{ portalUser().firstName }} {{ portalUser().lastName }}
-        <span class="username-muted">({{ portalUser().userName }})</span>
-      </h4>
-      <p class="w3-text-grey">{{ portalUser().city }} — {{ portalUser().address }}</p>
-      <p>{{ portalUser().bio }}</p>
-
-      @if (portalUser().isBanned) {
-        <span class="w3-tag w3-red">🚫 Bannato</span>
-      }
-
-      @if (portalUser().operationsProvided?.length) {
-        <div class="w3-margin-top">
-          @for (op of portalUser().operationsProvided; track op.id) {
-            <span class="w3-tag w3-blue w3-margin-right">
-              {{ op.operationType?.name }} — {{ op.price }}€
-            </span>
-          }
-        </div>
+  <div class="card-header">
+    <div class="avatar">
+      @if (portalUser().profileImage) {
+        <img [src]="portalUser().profileImage" alt="foto" />
+      } @else {
+        <span class="avatar-initials">
+          {{ (portalUser().firstName?.[0] ?? portalUser().userName?.[0] ?? '?').toUpperCase() }}
+        </span>
       }
     </div>
-
-    <!-- TASTI ADMIN -->
-    @if (isAdmin()) {
-      <div class="w3-col s12 m2 l2 admin-actions">
-        @if (!portalUser().isBanned) {
-          <button class="btn-ban" (click)="onBan.emit(portalUser().id)">🚫 Banna</button>
-        } @else {
-          <button class="btn-unban" (click)="onUnban.emit(portalUser().id)">✅ Sbanna</button>
+    <div class="card-identity">
+      <div class="card-name">
+        {{ portalUser().firstName || '' }} {{ portalUser().lastName || '' }}
+        @if (!portalUser().firstName && !portalUser().lastName) {
+          {{ portalUser().userName }}
         }
-        <button class="btn-delete" (click)="onDelete.emit(portalUser().id)">🗑️ Elimina</button>
       </div>
+      <div class="card-username">@{{ portalUser().userName }}</div>
+    </div>
+    @if (portalUser().isBanned) {
+      <span class="badge-banned">bannato</span>
     }
   </div>
+
+  @if (portalUser().city) {
+    <div class="card-location">
+      📍 {{ portalUser().city }}
+      @if (portalUser().address) { — {{ portalUser().address }} }
+    </div>
+  }
+
+  @if (portalUser().bio) {
+    <p class="card-bio">{{ portalUser().bio }}</p>
+  }
+
+  @if (portalUser().operationsProvided?.length) {
+    <div class="card-services">
+      @for (op of portalUser().operationsProvided; track op.id) {
+        <span class="service-tag">
+          {{ op.operationType?.name }}
+          @if (op.price) {
+            <span class="service-price">{{ op.price }}€</span>
+          }
+        </span>
+      }
+    </div>
+  }
+
+  @if (isAdmin()) {
+    <div class="admin-bar">
+      @if (!portalUser().isBanned) {
+        <button class="btn-admin btn-ban" (click)="onBan.emit(portalUser().id)">
+          🚫 Banna
+        </button>
+      } @else {
+        <button class="btn-admin btn-unban" (click)="onUnban.emit(portalUser().id)">
+          ✅ Sbanna
+        </button>
+      }
+      <button class="btn-admin btn-delete" (click)="onDelete.emit(portalUser().id)">
+        🗑 Elimina
+      </button>
+    </div>
+  }
 
 </div>

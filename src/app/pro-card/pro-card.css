@@ -1,6 +1,158 @@
-.banned { opacity: 0.5; border-left: 4px solid red; }
-.username-muted { font-size: 0.85rem; color: #888; font-weight: 400; }
-.admin-actions { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 0.5rem; }
-.btn-ban    { background: #ff9800; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
-.btn-unban  { background: #4caf50; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
-.btn-delete { background: #f44336; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }    
+.card {
+  background: #1a2e22;
+  border: 1px solid rgba(37,168,101,0.15);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(37,168,101,0.35);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+
+.card-banned {
+  opacity: 0.5;
+  border-left: 3px solid #f44336;
+}
+
+/* HEADER */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(37,168,101,0.12);
+  border: 1.5px solid rgba(37,168,101,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-initials {
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  color: #25a865;
+}
+
+.card-identity { flex: 1; min-width: 0; }
+
+.card-name {
+  font-family: 'Georgia', serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #ffffff;
+  margin: 0 0 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-username {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+}
+
+.badge-banned {
+  background: rgba(244,67,54,0.12);
+  border: 1px solid rgba(244,67,54,0.3);
+  color: #ff6b7a;
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 100px;
+}
+
+/* LOCATION */
+.card-location {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.35);
+}
+
+/* BIO */
+.card-bio {
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.55;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* SERVIZI */
+.card-services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.service-tag {
+  background: rgba(37,168,101,0.08);
+  border: 1px solid rgba(37,168,101,0.2);
+  color: #4dd98a;
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.service-price {
+  color: rgba(77,217,138,0.7);
+  font-size: 0.68rem;
+}
+
+/* ADMIN BAR */
+.admin-bar {
+  display: flex;
+  gap: 0.4rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: auto;
+}
+
+.btn-admin {
+  flex: 1;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  background: transparent;
+}
+
+.btn-admin:hover { opacity: 0.8; transform: translateY(-1px); }
+
+.btn-ban    { color: #ffb74d; border-color: rgba(255,152,0,0.3); }
+.btn-unban  { color: #81c784; border-color: rgba(76,175,80,0.3); }
+.btn-delete { color: #e57373; border-color: rgba(244,67,54,0.3); }
