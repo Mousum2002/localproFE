@@ -8,7 +8,7 @@ import { Auth } from '../auth';
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './login-page.html',
-  styleUrls: ['./login-page.css'], // plural
+  styleUrls: ['./login-page.css'],
 })
 export class LoginPage {
 
@@ -20,7 +20,6 @@ export class LoginPage {
   constructor(private auth: Auth, private router: Router) {}
 
   login() {
-    
     if (!this.userName || !this.password) {
       this.error.set('Inserisci username e password.');
       return;
@@ -30,23 +29,18 @@ export class LoginPage {
     this.error.set('');
 
     this.auth.login(this.userName, this.password).subscribe({
-      next: (users) => {
-        this.router.navigate(['/']);
+      next: () => {
         this.loading.set(false);
-      
-        const me = users.find((u: any) => u.userName === this.userName);
-        if (me) {
-          this.auth.currentUser.set(me); // salva l’utente loggato
-          
-        } else {
-          this.error.set('Credenziali non valide.');
-        }
+        this.router.navigate(['/']);  // naviga solo se login ok
       },
       error: (e) => {
-        this.router.navigate(['/']);
-        console.log(e);
         this.loading.set(false);
-        this.error.set('Username o password errati.');
+        console.log(e);
+        if (e.status === 401) {
+          this.error.set('Username o password errati.');
+        } else {
+          this.error.set('Errore di connessione. Riprova.');
+        }
       }
     });
   }

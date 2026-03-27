@@ -23,7 +23,7 @@ export class Auth {
 
   private http   = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = 'http://localhost:8089';
+  private apiUrl = 'http://localhost:8080';
 
   currentUser = signal<LoggedUser | null>(null);
   isLoggedIn  = signal<boolean>(false);
