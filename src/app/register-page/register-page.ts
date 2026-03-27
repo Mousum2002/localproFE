@@ -63,7 +63,7 @@ export class RegisterPage {
       next: () => {
         this.loading.set(false);
         this.success.set(true);
-        setTimeout(() => this.router.navigate(['/login']), 2000);
+        setTimeout(() => this.router.navigate(['/home']), 2000);
       },
       error: () => {
         this.loading.set(false);
