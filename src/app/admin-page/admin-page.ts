@@ -1,127 +1,115 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-
-interface PortalUser {
-  id: number;
-  userName: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  profileImage?: string;
-  isBanned: boolean;
-  roles: string[];
-}
+import { AdminService } from '../admin-service'; 
+import { PortalUser } from '../model/entities';
 
 @Component({
   selector: 'app-admin-page',
-  imports: [FormsModule, NgFor, NgIf],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-page.html',
-  styleUrl: './admin-page.css',
+  styleUrls: ['./admin-page.css']
 })
 export class AdminPage implements OnInit {
+  private adminService = inject(AdminService);
+  private location = inject(Location);
 
-  users: PortalUser[] = [];
+  users = signal<PortalUser[]>([]);
+  loading = signal<boolean>(false);
+  error = signal<string | null>(null);
 
-  searchAll    = '';
+  searchAll = '';
   searchBanned = '';
 
-  loading = signal(false);
-  error   = signal('');
-
-  private apiUrl = 'http://localhost:8080/api/users';
-
-  constructor(private http: HttpClient, private router: Router) {}
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadUsers();
   }
 
-  // ── Data fetching ──────────────────────────────────
-
-  loadUsers() {
+  loadUsers(): void {
     this.loading.set(true);
-    this.error.set('');
-
-    this.http.get<PortalUser[]>(this.apiUrl, { withCredentials: true }).subscribe({
+    this.adminService.getAllUsers().subscribe({
       next: (data) => {
-        this.users = data;
+        console.log(data);
+        this.users.set(data);
         this.loading.set(false);
       },
       error: () => {
-        this.error.set('Impossibile caricare gli utenti. Riprova.');
+        this.error.set("Errore nel caricamento della dashboard");
         this.loading.set(false);
-      },
+      }
     });
   }
 
-  // ── Computed lists ─────────────────────────────────
-
-  get bannedUsers(): PortalUser[] {
-    return this.users.filter(u => u.isBanned);
-  }
-
-  get activeUsers(): PortalUser[] {
-    return this.users.filter(u => !u.isBanned);
-  }
+  // Stats calcolate (Usa le parentesi () perché sono Signals)
+  activeUsers = computed(() => this.users().filter(u => !u.banned));
+  bannedUsers = computed(() => this.users().filter(u => u.banned));
 
   get filteredUsers(): PortalUser[] {
-    const q = this.searchAll.toLowerCase().trim();
-    if (!q) return this.users;
-    return this.users.filter(u => this.matchesQuery(u, q));
+    const term = this.searchAll.toLowerCase().trim();
+    return this.users().filter(u => 
+      u.email.toLowerCase().includes(term) || 
+      (u.userName && u.userName.toLowerCase().includes(term)) ||
+      `${u.firstName} ${u.lastName}`.toLowerCase().includes(term)
+    );
   }
 
   get filteredBanned(): PortalUser[] {
-    const q = this.searchBanned.toLowerCase().trim();
-    const banned = this.bannedUsers;
-    if (!q) return banned;
-    return banned.filter(u => this.matchesQuery(u, q));
-  }
-
-  // ── Actions ────────────────────────────────────────
-
-  banUser(user: PortalUser) {
-    this.http
-      .put(`${this.apiUrl}/${user.id}/ban`, {}, { withCredentials: true })
-      .subscribe({
-        next: () => { user.isBanned = true; },
-        error: () => this.error.set(`Impossibile bannare @${user.userName}.`),
-      });
-  }
-
-  unbanUser(user: PortalUser) {
-    this.http
-      .put(`${this.apiUrl}/${user.id}/unban`, {}, { withCredentials: true })
-      .subscribe({
-        next: () => { user.isBanned = false; },
-        error: () => this.error.set(`Impossibile rimuovere ban a @${user.userName}.`),
-      });
-  }
-
-  goBack() {
-    this.router.navigate(['/profilo']);
-  }
-
-  // ── Helpers ────────────────────────────────────────
-
-  getInitials(u: PortalUser): string {
-    const f = u.firstName?.[0]?.toUpperCase() ?? '';
-    const l = u.lastName?.[0]?.toUpperCase()  ?? '';
-    return (f + l) || u.userName[0]?.toUpperCase() || '?';
-  }
-
-  hasRole(u: PortalUser, role: string): boolean {
-    return (u.roles ?? []).some(r => r === role || r === `ROLE_${role}`);
-  }
-
-  private matchesQuery(u: PortalUser, q: string): boolean {
-    return (
-      u.userName.toLowerCase().includes(q) ||
-      u.email.toLowerCase().includes(q)    ||
-      (u.firstName ?? '').toLowerCase().includes(q) ||
-      (u.lastName  ?? '').toLowerCase().includes(q)
+    const term = this.searchBanned.toLowerCase().trim();
+    return this.bannedUsers().filter(u => 
+      u.email.toLowerCase().includes(term) ||
+      (u.userName && u.userName.toLowerCase().includes(term)) ||
+      `${u.firstName} ${u.lastName}`.toLowerCase().includes(term)
     );
+  }
+
+  // Poiché il backend usa lo stesso metodo per ban e unban (toggle)
+  // possiamo unificare la logica o chiamare lo stesso metodo del service
+  banUser(user: PortalUser): void {
+    // Verifichiamo che l'utente abbia un username valido prima di procedere
+    if (!user.userName) return;
+
+    const azione = user.banned ? 'sbannare' : 'bannare';
+    
+    if (confirm(`Sei sicuro di voler ${azione} l'utente ${user.userName}?`)) {
+      this.adminService.banUser(user.userName).subscribe({
+        next: (updatedUser: PortalUser) => {
+          // Aggiorniamo lo stato locale con l'oggetto restituito dal server
+          this.updateLocalUser(updatedUser);
+          console.log(`Utente ${updatedUser.userName} aggiornato. Stato ban: ${updatedUser.banned}`);
+        },
+        error: (err) => {
+          console.error("Errore durante il ban/unban:", err);
+          this.error.set("Impossibile comunicare con il server. Riprova più tardi.");
+        }
+      });
+    }
+  }
+
+  unbanUser(user: PortalUser): void {
+    // Chiamiamo lo stesso metodo perché il backend fa toggle
+    this.banUser(user);
+  }
+
+  private updateLocalUser(updatedUser: PortalUser): void {
+    this.users.update(list => 
+      list.map(u => (u.id === updatedUser.id ? updatedUser : u))
+    );
+    // I Signals 'activeUsers' e 'bannedUsers' si aggiorneranno automaticamente
+  }
+
+  getInitials(user: PortalUser): string {
+    const f = user.firstName ? user.firstName[0] : '';
+    const l = user.lastName ? user.lastName[0] : '';
+    return (f + l).toUpperCase() || '??';
+  }
+
+  // Nel tuo AdminPage.ts
+  hasRole(user: PortalUser, roleName: string): boolean {
+    return user.roles?.includes(roleName) ?? false;
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }

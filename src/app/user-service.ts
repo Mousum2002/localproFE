@@ -25,5 +25,24 @@ export class UserService {
         map(users => users.filter(user => user.operationProvided?.some(op => op.operationType.id === operationTypeId)))
       )
     }
+
+    //aggiunto durante la creazione di AdminPage.ts
+    public banUser(userId: number): Observable<void> {
+      return this.http.patch<void>(`${this.apiUrl}/${userId}/ban`, {}).pipe(
+        tap(() => this.invalidateCache())
+      );
+    }
+
+    //aggiunto durante la creazione di AdminPage.ts
+    public unbanUser(userId: number): Observable<void> {
+      return this.http.patch<void>(`${this.apiUrl}/${userId}/unban`, {}).pipe(
+        tap(() => this.invalidateCache())
+      );
+    }
+
+    //aggiunto durante la creazione di AdminPage.ts
+    private invalidateCache(): void {
+      this._allUsers = null;
+    }
   
 }

@@ -1,6 +1,7 @@
 export interface PortalUser
 {
     id?: number;
+    userName: string; // aggiunto durante creazione AdminPage.ts
     firstName: string;
     lastName: string;
     email: string;
@@ -10,14 +11,17 @@ export interface PortalUser
     bio: string
     x: number;
     y: number;
-    role: 'ADMIN' | 'USER' | 'VENDOR';
+    roles: string[];
+    banned: boolean;  //aggiunto durante la creazione di AdminPage.ts
     reviews: Review[];
     operationProvided: OperationTypeByVendor[];
+    profileImage?: string;  //aggiunto durante la creazione di AdminPage.ts
 }
 
 export interface Review
 {
     id?: number;
+    userId: number;
     rating: number;
     description: string;
 }
