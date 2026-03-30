@@ -1,0 +1,92 @@
+<div class="service-wrapper">
+
+  <div class="page-header">
+    <h1 class="page-title">Servizi disponibili</h1>
+    <p class="page-sub">Esplora i professionisti e prenota il servizio di cui hai bisogno</p>
+    @if (isLoggedIn) {
+      <a routerLink="/create-service" class="btn-create">+ Offri un servizio</a>
+    }
+  </div>
+
+  <!-- FILTRI -->
+  <div class="filter-bar">
+    <input class="filter-input" type="text"
+      placeholder="🔍 Cerca per nome o descrizione..."
+      [(ngModel)]="searchText"
+      (ngModelChange)="filter()" />
+
+    <select class="filter-select"
+      [(ngModel)]="selectedCategory"
+      (ngModelChange)="filter()">
+      <option value="">Tutte le categorie</option>
+      @for (cat of categories(); track cat) {
+        <option [value]="cat">{{ cat }}</option>
+      }
+    </select>
+
+    <input class="filter-input" type="text"
+      placeholder="📍 Filtra per città..."
+      [(ngModel)]="cityFilter"
+      (ngModelChange)="filter()" />
+
+    <span class="filter-count">{{ filteredServices().length }} servizi trovati</span>
+  </div>
+
+  <!-- GRIGLIA SERVIZI -->
+  <div class="services-grid">
+    @for (s of filteredServices(); track s.id) {
+      <div class="service-card">
+
+        <!-- HEADER CARD -->
+        <div class="card-top">
+          <div class="card-avatar">
+            {{ s.userName?.[0]?.toUpperCase() ?? '?' }}
+          </div>
+          <div class="card-identity">
+            <div class="card-username">{{ s.userName }}</div>
+            @if (s.city) {
+              <div class="card-city">📍 {{ s.city }}</div>
+            }
+          </div>
+          @if (s.category) {
+            <span class="card-category">{{ s.category }}</span>
+          }
+        </div>
+
+        <!-- DESCRIZIONE -->
+        <p class="card-description">{{ s.description }}</p>
+
+        <!-- FOOTER CARD -->
+        <div class="card-footer">
+          <div class="card-meta">
+            @if (s.ratingAvg > 0) {
+              <span class="card-rating">
+                ★ {{ s.ratingAvg }}/5
+              </span>
+            }
+            <span class="card-price">{{ s.price }}€</span>
+          </div>
+
+          @if (isLoggedIn) {
+            <button class="btn-book" (click)="bookService(s.id)">
+              Prenota
+            </button>
+          } @else {
+            <a routerLink="/login" class="btn-book-login">
+              Accedi per prenotare
+            </a>
+          }
+        </div>
+
+      </div>
+    }
+
+    @if (filteredServices().length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">🔍</span>
+        <p>Nessun servizio trovato</p>
+      </div>
+    }
+  </div>
+
+</div>

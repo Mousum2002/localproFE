@@ -5,6 +5,8 @@ import { LoginPage } from './login-page/login-page';
 import { RegisterPage } from './register-page/register-page';
 import { ProfilePage } from './profile-page/profile-page';
 import { AdminPage } from './admin-page/admin-page';
+import { ServicePage } from './service-page/service-page';
+import { CreateServicePage } from './create-service-page/create-service-page';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
@@ -13,5 +15,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterPage },
   { path: 'profilo', component: ProfilePage },
   { path: 'admin', component: AdminPage },
+  { path: 'servizi', component: ServicePage },
+  { path: 'create-service', component: CreateServicePage },
   { path: '**', redirectTo: '' },
 ];

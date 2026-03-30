@@ -11,6 +11,7 @@ import { Auth } from './auth';
       <div class="nav-links">
         <a routerLink="/">Home</a>
         <a routerLink="/professionisti">Professionisti</a>
+        <a routerLink="/servizi">Servizi</a>
         @if (auth.isLoggedIn()) {
           @if (auth.isAdmin) {
             <a routerLink="/admin" class="btn-admin"> Admin</a>

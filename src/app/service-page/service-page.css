@@ -1,0 +1,256 @@
+.service-wrapper {
+  min-height: 100vh;
+  background: #12201a;
+  padding: 3rem 5%;
+}
+
+/* HEADER */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-family: 'Georgia', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+  flex: 1;
+}
+
+.page-sub {
+  width: 100%;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.35);
+  margin: 0;
+}
+
+.btn-create {
+  background: #25a865;
+  color: #ffffff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-create:hover { background: #1a7a4a; }
+
+/* FILTRI */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: #1a2e22;
+  border: 1px solid rgba(37,168,101,0.2);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.filter-input,
+.filter-select {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color 0.2s;
+  min-width: 180px;
+}
+
+.filter-input::placeholder { color: rgba(255,255,255,0.25); }
+.filter-input:focus,
+.filter-select:focus { border-color: #25a865; }
+.filter-select option { background: #1a2e22; color: #fff; }
+
+.filter-count {
+  margin-left: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.35);
+}
+
+/* GRIGLIA */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* CARD */
+.service-card {
+  background: #1a2e22;
+  border: 1px solid rgba(37,168,101,0.15);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.service-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(37,168,101,0.35);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.card-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(37,168,101,0.12);
+  border: 1.5px solid rgba(37,168,101,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  color: #25a865;
+  flex-shrink: 0;
+}
+
+.card-identity { flex: 1; min-width: 0; }
+
+.card-username {
+  font-family: 'Georgia', serif;
+  font-size: 0.95rem;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-city {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.35);
+  margin-top: 0.15rem;
+}
+
+.card-category {
+  background: rgba(37,168,101,0.1);
+  border: 1px solid rgba(37,168,101,0.25);
+  color: #4dd98a;
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.card-description {
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: auto;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.card-rating {
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: #f0c040;
+}
+
+.card-price {
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  color: #25a865;
+}
+
+.btn-book {
+  background: #25a865;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-book:hover {
+  background: #1a7a4a;
+  transform: translateY(-1px);
+}
+
+.btn-book-login {
+  background: transparent;
+  border: 1px solid rgba(37,168,101,0.3);
+  color: rgba(255,255,255,0.4);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-book-login:hover {
+  border-color: #25a865;
+  color: #25a865;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 5rem 2rem;
+  color: rgba(255,255,255,0.25);
+  font-family: 'Courier New', monospace;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+  .services-grid { grid-template-columns: 1fr; }
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .filter-count { margin-left: 0; }
+  .page-header { flex-direction: column; align-items: flex-start; }
+}

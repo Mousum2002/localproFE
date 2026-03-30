@@ -1,0 +1,114 @@
+<div class="create-wrapper">
+  <div class="create-card">
+
+    <div class="card-brand">
+      <span class="brand-dot"></span>
+      <span class="brand-name">LocalPro</span>
+    </div>
+
+    <a routerLink="/servizi" class="back-link">← Torna ai servizi</a>
+
+    <h1 class="create-title">Offri un servizio</h1>
+    <p class="create-sub">
+      Descrivi il servizio che vuoi offrire. Se la categoria esiste già
+      ti verrà suggerita automaticamente, altrimenti ne creerai una nuova.
+    </p>
+
+    @if (success()) {
+      <div class="success-msg">
+        ✓ Servizio pubblicato con successo! Reindirizzamento...
+      </div>
+    } @else {
+
+      <!-- NOME CATEGORIA (testo libero + autocomplete) -->
+      <div class="form-group">
+        <label class="form-label">Nome del servizio *</label>
+        <div class="autocomplete-wrapper">
+          <input class="form-input"
+            type="text"
+            placeholder="es. Idraulico, Elettricista, Giardiniere..."
+            [(ngModel)]="categoryName"
+            (ngModelChange)="showSuggestions = true; error.set('')"
+            (blur)="showSuggestions = false"
+            autocomplete="off" />
+          @if (showSuggestions && suggestions.length > 0) {
+            <div class="suggestions-list">
+              @for (s of suggestions; track s.id) {
+                <div class="suggestion-item" (mousedown)="selectSuggestion(s)">
+                  <span class="suggestion-name">{{ s.name }}</span>
+                  <span class="suggestion-hint">categoria esistente</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <span class="form-hint">Scrivi liberamente — se la categoria esiste già verrà riutilizzata</span>
+      </div>
+
+      <!-- DESCRIZIONE / PRESENTAZIONE -->
+      <div class="form-group">
+        <label class="form-label">Presentazione del servizio *</label>
+        <textarea class="form-input form-textarea"
+          rows="4"
+          placeholder="Descrivi la tua esperienza, specializzazioni, anni di attività..."
+          [(ngModel)]="description"
+          (ngModelChange)="error.set('')"
+          maxlength="500"></textarea>
+        <span class="form-hint">{{ description.length }}/500 caratteri</span>
+      </div>
+
+      <!-- TAG (opzionale) -->
+      <div class="form-group">
+        <label class="form-label">Tag descrittivi</label>
+        <input class="form-input"
+          type="text"
+          placeholder="es. urgenze, notturno, senza chiamata fissa..."
+          [(ngModel)]="tagsInput" />
+        <span class="form-hint">Separati da virgola — aiutano i clienti a trovarti</span>
+      </div>
+
+      <!-- ANTEPRIMA (se nome e descrizione compilati) -->
+      @if (categoryName.trim() && description.trim()) {
+        <div class="preview-box">
+          <div class="preview-label">Anteprima scheda</div>
+          <div class="preview-name">{{ categoryName }}</div>
+          <div class="preview-desc">{{ description }}</div>
+          @if (tagsInput.trim()) {
+            <div class="preview-tags">
+              @for (tag of tagsInput.split(','); track tag) {
+                @if (tag.trim()) {
+                  <span class="preview-tag">{{ tag.trim() }}</span>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- PREZZO -->
+      <div class="form-group">
+        <label class="form-label">Prezzo (€) *</label>
+        <div class="price-input-wrapper">
+          <span class="price-symbol">€</span>
+          <input class="form-input price-input"
+            type="number"
+            min="0"
+            placeholder="es. 50"
+            [(ngModel)]="price" />
+        </div>
+        <span class="form-hint">Prezzo per intervento/ora — puoi modificarlo in seguito dal profilo</span>
+      </div>
+
+      @if (error()) {
+        <div class="error-msg">❌ {{ error() }}</div>
+      }
+
+      <button class="btn-create" (click)="create()" [disabled]="loading()">
+        @if (loading()) { Pubblicazione in corso... }
+        @else { Pubblica servizio }
+      </button>
+
+    }
+
+  </div>
+</div>
