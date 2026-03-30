@@ -1,40 +1,105 @@
-<!-- SEZIONE SERVIZI OFFERTI -->
-<div class="form-card" style="margin-top: 1.5rem;">
-  <h2 class="form-title">I miei servizi</h2>
-  <p class="form-sub">Aggiungi i servizi che offri come professionista</p>
+<div class="profile-container">
 
-  <!-- SERVIZI ESISTENTI -->
-  @if (myServices().length) {
-    <div class="services-list">
-      @for (s of myServices(); track s.id) {
-        <div class="service-row">
-          <span class="service-name">{{ s.operationType?.name }}</span>
-          <span class="service-price">{{ s.price }}€</span>
-          <button class="btn-remove" (click)="removeService(s.id)">✕</button>
-        </div>
+  <!-- ── HEADER CARD ── -->
+  <div class="profile-header-card">
+
+    <div class="avatar-wrapper">
+      <div class="avatar" (click)="fileInput.click()">
+        @if (previewUrl || profileImageUrl) {
+          <img [src]="previewUrl || profileImageUrl" alt="Foto profilo" />
+        } @else {
+          <span class="initials">{{ initials }}</span>
+        }
+        <div class="avatar-overlay"><span>📷</span></div>
+      </div>
+      <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+      <p class="avatar-hint">Clicca per cambiare foto</p>
+    </div>
+
+    <div class="header-info">
+      <h1 class="username">{{ auth.currentUser()?.userName }}</h1>
+      <span class="email">{{ auth.currentUser()?.email }}</span>
+      @if (isAdmin) {
+        <span class="badge-admin">👑 Admin</span>
+      } @else {
+        <span class="badge-user">Utente</span>
       }
     </div>
-  } @else {
-    <p class="empty-services">Nessun servizio associato al tuo profilo.</p>
-  }
 
-  <!-- AGGIUNGI NUOVO SERVIZIO -->
-  <div class="add-service-form">
-    <select class="form-input" [(ngModel)]="newServiceTypeId">
-      <option value="">Scegli una categoria...</option>
-      @for (type of operationTypes(); track type.id) {
-        <option [value]="type.id">{{ type.name }}</option>
-      }
-    </select>
-    <input class="form-input" type="number" min="0"
-      placeholder="Prezzo (€)" [(ngModel)]="newServicePrice" />
-    <button class="btn-add-service" (click)="addService()">+ Aggiungi</button>
   </div>
 
-  @if (serviceError()) {
-    <p class="msg-error">❌ {{ serviceError() }}</p>
-  }
-  @if (serviceSuccess()) {
-    <p class="msg-success">✅ Servizio aggiunto!</p>
-  }
+  <!-- ── FORM MODIFICA PROFILO ── -->
+  <div class="form-card">
+    <h2 class="form-title">Modifica Profilo</h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="firstName">Nome</label>
+        <input id="firstName" class="form-input" type="text" [(ngModel)]="firstName" placeholder="Il tuo nome" />
+      </div>
+      <div class="form-group">
+        <label for="lastName">Cognome</label>
+        <input id="lastName" class="form-input" type="text" [(ngModel)]="lastName" placeholder="Il tuo cognome" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="bio">Bio</label>
+      <textarea id="bio" class="form-input" [(ngModel)]="bio" rows="4"
+        placeholder="Scrivi qualcosa su di te..." maxlength="300"></textarea>
+      <span class="char-count">{{ bio.length }}/300</span>
+    </div>
+
+    @if (error()) {
+      <p class="msg-error">❌ {{ error() }}</p>
+    }
+    @if (success()) {
+      <p class="msg-success">✅ Profilo aggiornato con successo!</p>
+    }
+
+    <button class="btn-save" (click)="save()" [disabled]="loading()">
+      @if (loading()) { <span>Salvataggio...</span> }
+      @else { <span>Salva modifiche</span> }
+    </button>
+  </div>
+
+  <!-- ── SEZIONE SERVIZI OFFERTI ── -->
+  <div class="form-card">
+    <h2 class="form-title">I miei servizi</h2>
+    <p class="form-sub">Aggiungi i servizi che offri come professionista</p>
+
+    @if (myServices().length) {
+      <div class="services-list">
+        @for (s of myServices(); track s.id) {
+          <div class="service-row">
+            <span class="service-name">{{ s.operationType?.name }}</span>
+            <span class="service-price">{{ s.price }}€</span>
+            <button class="btn-remove" (click)="removeService(s.id)">✕</button>
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="empty-services">Nessun servizio associato al tuo profilo.</p>
+    }
+
+    <div class="add-service-form">
+      <select class="form-input" [(ngModel)]="newServiceTypeId">
+        <option value="">Scegli una categoria...</option>
+        @for (type of operationTypes(); track type.id) {
+          <option [value]="type.id">{{ type.name }}</option>
+        }
+      </select>
+      <input class="form-input" type="number" min="0"
+        placeholder="Prezzo (€)" [(ngModel)]="newServicePrice" />
+      <button class="btn-add-service" (click)="addService()">+ Aggiungi</button>
+    </div>
+
+    @if (serviceError()) {
+      <p class="msg-error">❌ {{ serviceError() }}</p>
+    }
+    @if (serviceSuccess()) {
+      <p class="msg-success">✅ Servizio aggiunto!</p>
+    }
+  </div>
+
 </div>

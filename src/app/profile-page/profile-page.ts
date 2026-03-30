@@ -18,20 +18,19 @@ export class ProfilePage implements OnInit {
   selectedFile: File | null = null;
   previewUrl: string | null = null;
 
-  // per i servizi offerti
   operationTypes = signal<any[]>([]);
-  myServices = signal<any[]>([]);
+  myServices     = signal<any[]>([]);
   newServiceTypeId: number | string = '';
   newServicePrice: number = 0;
 
-  loading = signal(false);
-  success = signal(false);
-  error = signal('');
-  serviceError = signal('');
+  loading        = signal(false);
+  success        = signal(false);
+  error          = signal('');
+  serviceError   = signal('');
   serviceSuccess = signal(false);
 
-  private apiUrl = 'http://localhost:8080/api/users';
-  private vendorUrl = 'http://localhost:8080/api/vendor-operations';
+  private apiUrl     = 'http://localhost:8080/api/users';
+  private vendorUrl  = 'http://localhost:8080/api/vendor-operations';
   private opTypesUrl = 'http://localhost:8080/api/operation-types';
 
   constructor(public auth: Auth, private http: HttpClient) {}
@@ -39,17 +38,15 @@ export class ProfilePage implements OnInit {
   ngOnInit() {
     const user = this.auth.currentUser();
     if (user) {
-      this.firstName = user.firstName ?? '';
-      this.lastName  = user.lastName  ?? '';
-      this.bio       = user.bio ?? '';
+      this.firstName       = user.firstName    ?? '';
+      this.lastName        = user.lastName     ?? '';
+      this.bio             = user.bio          ?? '';
       this.profileImageUrl = user.profileImage ?? '';
     }
 
-    // carica categorie disponibili
-    this.http.get<any[]>(this.opTypesUrl)
+    this.http.get<any[]>(this.opTypesUrl, { withCredentials: true })
       .subscribe(types => this.operationTypes.set(types));
 
-    // carica i servizi già associati all'utente
     this.loadMyServices();
   }
 
@@ -69,11 +66,12 @@ export class ProfilePage implements OnInit {
       this.serviceError.set('Il prezzo non può essere negativo.');
       return;
     }
-
     this.serviceError.set('');
+
+    // Il backend legge l'utente dal SecurityContext, non serve mandare userId
     const body = {
       operationTypeId: Number(this.newServiceTypeId),
-      price: this.newServicePrice
+      price: this.newServicePrice,
     };
 
     this.http.post(this.vendorUrl, body, { withCredentials: true })
@@ -81,11 +79,11 @@ export class ProfilePage implements OnInit {
         next: () => {
           this.serviceSuccess.set(true);
           this.newServiceTypeId = '';
-          this.newServicePrice = 0;
+          this.newServicePrice  = 0;
           this.loadMyServices();
           setTimeout(() => this.serviceSuccess.set(false), 3000);
         },
-        error: () => this.serviceError.set('Errore durante l\'aggiunta del servizio.')
+        error: () => this.serviceError.set("Errore durante l'aggiunta del servizio."),
       });
   }
 
@@ -100,9 +98,7 @@ export class ProfilePage implements OnInit {
     if (input.files && input.files[0]) {
       this.selectedFile = input.files[0];
       const reader = new FileReader();
-      reader.onload = (e) => {
-        this.previewUrl = e.target?.result as string;
-      };
+      reader.onload = (e) => { this.previewUrl = e.target?.result as string; };
       reader.readAsDataURL(this.selectedFile);
     }
   }
@@ -110,6 +106,7 @@ export class ProfilePage implements OnInit {
   save() {
     const user = this.auth.currentUser();
     if (!user) return;
+
     this.loading.set(true);
     this.error.set('');
     this.success.set(false);
@@ -128,9 +125,9 @@ export class ProfilePage implements OnInit {
       profileImage: this.previewUrl ?? this.profileImageUrl,
     };
 
-    this.http.put(`${this.apiUrl}/${user.id}`, body, { withCredentials: true })
+    this.http.put<any>(`${this.apiUrl}/${user.id}`, body, { withCredentials: true })
       .subscribe({
-        next: (updated: any) => {
+        next: (updated) => {
           this.loading.set(false);
           this.success.set(true);
           const newUser = {
@@ -158,7 +155,6 @@ export class ProfilePage implements OnInit {
   }
 
   get isAdmin(): boolean {
-    const roles = this.auth.currentUser()?.roles ?? [];
-    return roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
+    return this.auth.isAdmin;
   }
 }

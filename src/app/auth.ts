@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 
 export interface LoggedUser {
   id: number;
@@ -28,32 +28,31 @@ export class Auth {
   currentUser = signal<LoggedUser | null>(null);
   isLoggedIn  = signal<boolean>(false);
 
-  login(userName: string, password: string): Observable<any> {
+  login(userName: string, password: string): Observable<LoggedUser[]> {
     const body = new URLSearchParams();
     body.set('username', userName);
     body.set('password', password);
 
+    // switchMap: aspetta il login, poi carica il profilo, poi emette
+    // così login-page riceve next() SOLO dopo che currentUser è impostato
     return this.http.post(
       `${this.apiUrl}/api/auth/login`,
       body.toString(),
       {
         headers: new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
-        withCredentials: true
+        withCredentials: true,
       }
     ).pipe(
-      tap(() => {
-        // dopo il login carichiamo i dati completi dell'utente
-        this.http.get<any[]>(`${this.apiUrl}/public`, { withCredentials: true })
-          .subscribe(users => {
-            const me = users.find((u: any) => u.userName === userName);
-            console.log('utente trovato:', me);
-            console.log('ruoli:', me?.roles);
-            if (me) {
-              this.currentUser.set(me);
-              this.isLoggedIn.set(true);
-              sessionStorage.setItem('user', JSON.stringify(me));
-            }
-          });
+      switchMap(() =>
+        this.http.get<LoggedUser[]>(`${this.apiUrl}/public`, { withCredentials: true })
+      ),
+      tap(users => {
+        const me = users.find(u => u.userName === userName);
+        if (me) {
+          this.currentUser.set(me);
+          this.isLoggedIn.set(true);
+          sessionStorage.setItem('user', JSON.stringify(me));
+        }
       })
     );
   }
@@ -76,8 +75,7 @@ export class Auth {
   }
 
   getAuthHeader(): HttpHeaders {
-    const encoded = sessionStorage.getItem('auth');
-    return new HttpHeaders({ Authorization: `Basic ${encoded}` });
+    return new HttpHeaders({});
   }
 
   get isAdmin(): boolean {
