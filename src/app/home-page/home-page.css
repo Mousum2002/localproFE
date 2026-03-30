@@ -100,20 +100,25 @@
 }
 
 .btn-ghost {
-  color: rgba(255,255,255,0.7);
+  cursor: pointer; /* Indispensabile per i tag <button> */
+  background: transparent;
+  color: var(--white); /* Testo ora bianco pieno */
   text-decoration: none;
   padding: 0.85rem 1.5rem;
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;
-  border: 1px solid rgba(255,255,255,0.2);
+  font-weight: 600; /* Un po' più di spessore al testo */
+  border: 2px solid rgba(255,255,255,0.5); /* Bordo più spesso e visibile */
   border-radius: 6px;
-  transition: border-color 0.2s, color 0.2s;
+  transition: all 0.3s ease; /* Transizione più fluida */
   display: inline-block;
 }
 
 .btn-ghost:hover {
-  border-color: rgba(255,255,255,0.5);
-  color: var(--white);
+  border-color: var(--green-light); /* Cambia colore al passaggio */
+  background: rgba(37, 168, 101, 0.1); /* Leggero riflesso verde */
+  color: var(--green-light);
+  transform: translateY(-2px); /* Effetto sollevamento */
 }
 
 .hero-stats {

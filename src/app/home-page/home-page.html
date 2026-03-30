@@ -13,7 +13,8 @@
     </p>
     <div class="hero-actions">
       <a routerLink="/professionisti" class="btn-primary">Cerca professionisti</a>
-      <a routerLink="/professionisti" class="btn-ghost">Scopri come funziona →</a>
+      <!-- scroll alla sezione "Come funziona" nella stessa pagina -->
+      <button class="btn-ghost" (click)="scrollToHowItWorks()">Scopri come funziona →</button>
     </div>
     <div class="hero-stats">
       <div class="stat">
@@ -79,8 +80,8 @@
   </div>
 </section>
 
-<!-- COME FUNZIONA -->
-<section class="section how-section">
+<!-- COME FUNZIONA — id aggiunto per lo scroll -->
+<section class="section how-section" id="come-funziona">
   <div class="section-inner">
     <div class="section-header">
       <h2>Come funziona</h2>
