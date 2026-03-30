@@ -12,6 +12,9 @@ import { Auth } from './auth';
         <a routerLink="/">Home</a>
         <a routerLink="/professionisti">Professionisti</a>
         @if (auth.isLoggedIn()) {
+          @if (auth.isAdmin) {
+            <a routerLink="/admin" class="btn-admin"> Admin</a>
+          }
           <a routerLink="/profilo" class="avatar-btn" [title]="'Il mio profilo'">
             @if (auth.currentUser()?.profileImage) {
               <img [src]="auth.currentUser()?.profileImage" alt="avatar" class="avatar-img" />
@@ -47,6 +50,17 @@ import { Auth } from './auth';
       text-decoration: none; transition: background 0.2s !important;
     }
     .btn-nav-login:hover { background: #1a7a4a !important; }
+    .btn-admin {
+      background: rgba(255,193,7,0.12) !important;
+      border: 1px solid rgba(255,193,7,0.35) !important;
+      color: #ffc107 !important;
+      padding: 0.3rem 0.9rem;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace; font-size: 0.8rem;
+      text-decoration: none !important;
+      transition: background 0.2s !important;
+    }
+    .btn-admin:hover { background: rgba(255,193,7,0.22) !important; color: #ffd54f !important; }
     .avatar-btn {
       width: 36px; height: 36px; border-radius: 50%;
       background: #1e3328; border: 2px solid #25a865;
@@ -72,9 +86,8 @@ export class App implements OnInit {
 
   get initials(): string {
     const user = this.auth.currentUser();
-    const f = (user as any)?.firstName?.charAt(0)?.toUpperCase() ?? '';
-    const l = (user as any)?.lastName?.charAt(0)?.toUpperCase() ?? '';
-    const fallback = (user as any)?.userName?.charAt(0)?.toUpperCase() ?? '?';
-    return (f + l) || fallback;
+    const f = user?.firstName?.[0]?.toUpperCase() ?? '';
+    const l = user?.lastName?.[0]?.toUpperCase()  ?? '';
+    return (f + l) || user?.userName?.[0]?.toUpperCase() || '?';
   }
 }

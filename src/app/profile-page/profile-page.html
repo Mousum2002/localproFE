@@ -20,7 +20,7 @@
       <h1 class="username">{{ auth.currentUser()?.userName }}</h1>
       <span class="email">{{ auth.currentUser()?.email }}</span>
       @if (isAdmin) {
-        <span class="badge-admin">👑 Admin</span>
+        <span class="badge-admin"> Admin</span>
       } @else {
         <span class="badge-user">Utente</span>
       }
