@@ -389,3 +389,32 @@
   .stats-row { grid-template-columns: 1fr 1fr; }
   .stat-chip:last-child { grid-column: span 2; }
 }
+
+.btn-delete {
+  background: transparent;
+  color: rgba(255, 107, 122, 0.5); /* Più discreto di default */
+  border: 1px solid rgba(255, 107, 122, 0.15);
+  border-radius: 8px;
+  padding: 0.35rem 0.75rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%; /* Per allinearli bene se messi in colonna */
+}
+
+.btn-delete:hover {
+  background: rgba(255, 0, 0, 0.15);
+  color: #ff3b3b;
+  border-color: rgba(255, 0, 0, 0.4);
+}
+
+/* Aggiorna il contenitore aside per gestire meglio i due bottoni */
+.user-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem; /* Leggero spazio tra i pulsanti */
+  min-width: 90px;
+}

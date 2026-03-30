@@ -36,4 +36,9 @@ export class AdminService {
   public unbanUser(userName: string): Observable<PortalUser> {
     return this.toggleBan(userName);
   }
+
+  public deleteUser(userId: number): Observable<void> {
+    // Nota: aggiungiamo withCredentials se il backend è protetto
+    return this.http.delete<void>(`http://localhost:8080/admin/delete/${userId}`, { withCredentials: true });
+  }
 }

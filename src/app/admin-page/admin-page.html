@@ -86,6 +86,12 @@
                 (click)="banUser(u)">
                 {{ u.banned ? 'Unban' : 'Ban' }}
               </button>
+
+              @if (!hasRole(u, 'ADMIN')) {
+                <button class="btn-delete" (click)="deleteUser(u)">
+                  Delete
+                </button>
+              }
             </div>
           </div>
         } @empty {
@@ -129,7 +135,12 @@
 
             <div class="user-aside">
               <span class="badge-banned">Bannato</span>
+              
               <button class="btn-unban" (click)="banUser(u)">Unban</button>
+              
+              <button class="btn-delete" (click)="deleteUser(u)">
+                Delete
+              </button>
             </div>
           </div>
         } @empty {

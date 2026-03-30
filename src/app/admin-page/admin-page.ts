@@ -112,4 +112,29 @@ export class AdminPage implements OnInit {
   goBack(): void {
     this.location.back();
   }
+
+
+  // Aggiungi questo metodo nella classe AdminPage
+deleteUser(user: PortalUser): void {
+  if (!user.id) return;
+
+  const confirmDelete = confirm(
+    `ATTENZIONE: Sei sicuro di voler eliminare DEFINITIVAMENTE l'utente ${user.userName}? Questa azione non può essere annullata.`
+  );
+
+  if (confirmDelete) {
+    this.adminService.deleteUser(user.id).subscribe({
+      next: () => {
+        // Rimuoviamo l'utente dalla lista locale (Signal)
+        this.users.update(list => list.filter(u => u.id !== user.id));
+        console.log(`Utente ${user.userName} eliminato con successo.`);
+      },
+      error: (err) => {
+        console.error("Errore durante l'eliminazione:", err);
+        this.error.set("Impossibile eliminare l'utente. Potrebbe avere dei dati collegati.");
+      }
+    });
+  }
+}
+
 }
