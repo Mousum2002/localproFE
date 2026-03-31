@@ -128,6 +128,8 @@
   font-size: 1.1rem;
   color: #25a865;
   flex-shrink: 0;
+  overflow: hidden; /* Importante per contenere l'immagine nel cerchio */
+  position: relative;
 }
 
 .card-identity { flex: 1; min-width: 0; }
@@ -253,4 +255,11 @@
   .filter-bar { flex-direction: column; align-items: stretch; }
   .filter-count { margin-left: 0; }
   .page-header { flex-direction: column; align-items: flex-start; }
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Mantiene le proporzioni tagliando gli eccessi */
+  display: block;
 }

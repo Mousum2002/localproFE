@@ -8,7 +8,6 @@
     }
   </div>
 
-  <!-- FILTRI -->
   <div class="filter-bar">
     <input class="filter-input" type="text"
       placeholder="🔍 Cerca per nome o descrizione..."
@@ -32,15 +31,17 @@
     <span class="filter-count">{{ filteredServices().length }} servizi trovati</span>
   </div>
 
-  <!-- GRIGLIA SERVIZI -->
   <div class="services-grid">
     @for (s of filteredServices(); track s.id) {
       <div class="service-card">
 
-        <!-- HEADER CARD -->
         <div class="card-top">
           <div class="card-avatar">
-            {{ s.userName?.[0]?.toUpperCase() ?? '?' }}
+            @if (s.profileImage) {
+              <img [src]="s.profileImage" alt="Avatar" class="avatar-img" />
+            } @else {
+              {{ s.userName?.[0]?.toUpperCase() ?? '?' }}
+            }
           </div>
           <div class="card-identity">
             <div class="card-username">{{ s.userName }}</div>
@@ -53,10 +54,8 @@
           }
         </div>
 
-        <!-- DESCRIZIONE -->
         <p class="card-description">{{ s.description }}</p>
 
-        <!-- FOOTER CARD -->
         <div class="card-footer">
           <div class="card-meta">
             @if (s.ratingAvg > 0) {

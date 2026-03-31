@@ -105,15 +105,100 @@ export class ProfilePage implements OnInit {
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
+      /*
       this.selectedFile = input.files[0];
       const reader = new FileReader();
       reader.onload = (e) => { this.previewUrl = e.target?.result as string; };
       reader.readAsDataURL(this.selectedFile);
+      */
+      const file = input.files[0];
+
+      // Controllo dimensione (opzionale ma consigliato: max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        this.error.set("L'immagine è troppo grande (max 2MB)");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        // Il risultato è una stringa che inizia con "data:image/png;base64,..."
+        const base64String = reader.result as string;
+        this.previewUrl = base64String;
+        this.profileImageUrl = base64String; // Prepariamo l'immagine per il salvataggio
+      };
+      reader.readAsDataURL(file);
     }
   }
 
   // ── SALVA PROFILO ─────────────────────────────────────────
 
+  save() {
+    const user = this.auth.currentUser();
+    if (!user) {
+      this.error.set("Utente non autenticato.");
+      return;
+    }
+
+    this.loading.set(true);
+    this.error.set('');
+    this.success.set(false);
+
+    // Prepariamo l'immagine: 
+    // 1. Se c'è una previewUrl, significa che l'utente ha appena selezionato un nuovo file (Base64).
+    // 2. Altrimenti usiamo la profileImageUrl esistente.
+    const finalImage = this.previewUrl || this.profileImageUrl;
+
+    const body: any = {
+      id:           user.id,
+      userName:     user.userName,
+      email:        user.email,
+      password:     'UNCHANGED', // O la logica che usa il tuo backend per non sovrascrivere la password
+      firstName:    this.firstName,
+      lastName:     this.lastName,
+      bio:          this.bio,
+      city:         user.city    ?? '',
+      address:      user.address ?? '',
+      x:            user.x       ?? 0,
+      y:            user.y       ?? 0,
+      profileImage: finalImage, // Qui inviamo la stringa Base64 al DB
+    };
+
+    this.http.put(`${this.apiUrl}/${user.id}`, body, { withCredentials: true })
+      .subscribe({
+        next: (updated: any) => {
+          this.loading.set(false);
+          this.success.set(true);
+          
+          // Aggiorniamo l'oggetto utente globale con i nuovi dati ritornati dal server
+          const newUser = {
+            ...user,
+            firstName:    updated.firstName,
+            lastName:     updated.lastName,
+            bio:          updated.bio,
+            profileImage: updated.profileImage,
+          };
+
+          // Aggiorniamo il segnale di Auth e la sessione
+          this.auth.currentUser.set(newUser);
+          sessionStorage.setItem('user', JSON.stringify(newUser));
+
+          // Puliamo la preview temporanea dato che ora l'immagine è salvata ufficialmente
+          this.previewUrl = null;
+          this.profileImageUrl = updated.profileImage;
+
+          // Messaggio di successo a tempo
+          setTimeout(() => this.success.set(false), 3000);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          console.error("Errore durante il salvataggio:", err);
+          this.error.set('Errore durante il salvataggio. Verifica la dimensione dell\'immagine.');
+        },
+      });
+}
+
+
+  /*
   save() {
     const user = this.auth.currentUser();
     if (!user) return;
@@ -157,7 +242,9 @@ export class ProfilePage implements OnInit {
           this.error.set('Salvataggio fallito. Riprova.');
         },
       });
+    
   }
+  */
 
   // ── GETTERS ───────────────────────────────────────────────
 
