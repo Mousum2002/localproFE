@@ -18,7 +18,7 @@
       <h1 class="username">{{ auth.currentUser()?.userName }}</h1>
       <span class="email">{{ auth.currentUser()?.email }}</span>
       @if (isAdmin) {
-        <span class="badge-admin"> Admin</span>
+        <span class="badge-admin">👑 Admin</span>
       } @else {
         <span class="badge-user">Utente</span>
       }
@@ -28,7 +28,6 @@
   <!-- ── MODIFICA PROFILO ──────────────────────────────────── -->
   <div class="form-card">
     <h2 class="form-title">Modifica Profilo</h2>
-
     <div class="form-row">
       <div class="form-group">
         <label for="firstName">Nome</label>
@@ -39,24 +38,16 @@
         <input id="lastName" type="text" [(ngModel)]="lastName" placeholder="Il tuo cognome" />
       </div>
     </div>
-
     <div class="form-group">
       <label for="bio">Bio</label>
       <textarea id="bio" [(ngModel)]="bio" rows="4"
         placeholder="Scrivi qualcosa su di te..." maxlength="300"></textarea>
       <span class="char-count">{{ bio.length }}/300</span>
     </div>
-
-    @if (error()) {
-      <p class="msg-error">❌ {{ error() }}</p>
-    }
-    @if (success()) {
-      <p class="msg-success">✅ Profilo aggiornato con successo!</p>
-    }
-
+    @if (error()) { <p class="msg-error">❌ {{ error() }}</p> }
+    @if (success()) { <p class="msg-success">✅ Profilo aggiornato con successo!</p> }
     <button class="btn-save" (click)="save()" [disabled]="loading()">
-      @if (loading()) { <span>Salvataggio...</span> }
-      @else { <span>Salva modifiche</span> }
+      @if (loading()) { <span>Salvataggio...</span> } @else { <span>Salva modifiche</span> }
     </button>
   </div>
 
@@ -74,28 +65,27 @@
     } @else {
       <div class="items-list">
         @for (b of myBookings(); track b.id) {
-          <div class="item-row" [class.item-cancelled]="b.status === 'CANCELLED'">
+          <div class="item-row" [class.item-cancelled]="b.status === 'Cancellata'">
             <div class="item-info">
-              <div class="item-name">{{ b.operationTypeName }}</div>
+              <div class="item-name">{{ b.serviceOperationName }}</div>
+              <div class="item-description">{{ b.serviceDescription }}</div>
               <div class="item-meta">
-                <span>👤 {{ b.vendorUserName }}</span>
-                <span>💶 {{ b.price }}€</span>
-                @if (b.requestedAt) {
-                  <span>📅 {{ b.requestedAt | date:'dd/MM/yyyy' }}</span>
+                <span class="meta-chip">👤 {{ b.vendorUserName }}</span>
+                @if (b.vendorCity) {
+                  <span class="meta-chip">📍 {{ b.vendorCity }}</span>
+                }
+                <span class="meta-chip price-chip">💶 {{ b.servicePrice }}€</span>
+                @if (b.reservationDate) {
+                  <span class="meta-chip">📅 {{ b.reservationDate | date:'dd/MM/yyyy HH:mm' }}</span>
                 }
               </div>
-              @if (b.notes) {
-                <div class="item-notes">{{ b.notes }}</div>
-              }
             </div>
             <div class="item-actions">
               <span class="status-badge" [class]="bookingStatusClass(b.status)">
                 {{ bookingStatusLabel(b.status) }}
               </span>
-              @if (b.status !== 'CANCELLED' && b.status !== 'COMPLETED') {
-                <button class="btn-cancel" (click)="cancelBooking(b.id)">
-                  Annulla
-                </button>
+              @if (b.status !== 'Cancellata' && b.status !== 'Completato') {
+                <button class="btn-cancel" (click)="cancelBooking(b.id)">Annulla</button>
               }
             </div>
           </div>
@@ -125,16 +115,17 @@
         @for (s of myServices(); track s.id) {
           <div class="item-row">
             <div class="item-info">
-              <div class="item-name">{{ s.operationType?.name }}</div>
+              <div class="item-name">{{ s.operationTypeName }}</div>
+              <div class="item-description">{{ s.operationTypeDescription }}</div>
               <div class="item-meta">
-                <span>📝 {{ s.operationType?.description }}</span>
-                <span class="item-price">💶 {{ s.price }}€</span>
+                @if (s.vendorCity) {
+                  <span class="meta-chip">📍 {{ s.vendorCity }}</span>
+                }
+                <span class="meta-chip price-chip">💶 {{ s.price }}€</span>
               </div>
             </div>
             <div class="item-actions">
-              <button class="btn-delete-service" (click)="deleteService(s.id)">
-                🗑 Elimina
-              </button>
+              <button class="btn-delete-service" (click)="deleteService(s.id)">🗑 Elimina</button>
             </div>
           </div>
         }

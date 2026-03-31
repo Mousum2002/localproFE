@@ -17,6 +17,7 @@
       <span class="stat-label">Utenti totali</span>
     </div>
     <div class="stat-chip stat-chip--active">
+      <!-- FIX: activeUsers e bannedUsers sono computed signals → vanno chiamati con () -->
       <span class="stat-value">{{ activeUsers().length }}</span>
       <span class="stat-label">Utenti attivi</span>
     </div>
@@ -53,10 +54,12 @@
       </div>
 
       <div class="user-list">
+        <!-- FIX: filteredUsers è un getter, non un signal → senza () -->
         @for (u of filteredUsers; track u.id) {
-          <div class="user-row" [class.user-row--banned]="u.banned">
-            
-            <div class="user-avatar-sm" [class.user-avatar-sm--banned]="u.banned">
+          <!-- FIX: era u.banned → corretto in u.isBanned -->
+          <div class="user-row" [class.user-row--banned]="u.isBanned">
+
+            <div class="user-avatar-sm" [class.user-avatar-sm--banned]="u.isBanned">
               @if (u.profileImage) {
                 <img [src]="u.profileImage" [alt]="u.userName" />
               } @else {
@@ -74,17 +77,17 @@
               @if (hasRole(u, 'ADMIN')) {
                 <span class="badge-admin">Admin</span>
               }
-              
-              @if (u.banned) {
+
+              @if (u.isBanned) {
                 <span class="badge-banned">Bannato</span>
               } @else if (!hasRole(u, 'ADMIN')) {
                 <span class="badge-user">● Attivo</span>
               }
 
-              <button 
-                [class]="u.banned ? 'btn-unban' : 'btn-ban'" 
+              <button
+                [class]="u.isBanned ? 'btn-unban' : 'btn-ban'"
                 (click)="banUser(u)">
-                {{ u.banned ? 'Unban' : 'Ban' }}
+                {{ u.isBanned ? 'Unban' : 'Ban' }}
               </button>
 
               @if (!hasRole(u, 'ADMIN')) {
@@ -135,12 +138,8 @@
 
             <div class="user-aside">
               <span class="badge-banned">Bannato</span>
-              
               <button class="btn-unban" (click)="banUser(u)">Unban</button>
-              
-              <button class="btn-delete" (click)="deleteUser(u)">
-                Delete
-              </button>
+              <button class="btn-delete" (click)="deleteUser(u)">Delete</button>
             </div>
           </div>
         } @empty {

@@ -12,28 +12,23 @@ import { Auth } from '../auth';
 })
 export class ProfilePage implements OnInit {
 
-  // dati profilo
   firstName = '';
-  lastName = '';
-  bio = '';
+  lastName  = '';
+  bio       = '';
   profileImageUrl = '';
   selectedFile: File | null = null;
   previewUrl: string | null = null;
 
-  // prenotazioni fatte da me
   myBookings = signal<any[]>([]);
-
-  // servizi che offro
   myServices = signal<any[]>([]);
 
   loading = signal(false);
   success = signal(false);
-  error = signal('');
+  error   = signal('');
 
   private apiUrl      = 'http://localhost:8080/api/users';
-  private bookingsUrl = 'http://localhost:8080/api/bookings';
+  private bookingsUrl = 'http://localhost:8080/api/prenotazioni';   // ← URL CORRETTO
   private vendorUrl   = 'http://localhost:8080/api/vendor-operations';
-  private bookingsUrl = 'http://localhost:8080/api/prenotazioni';
 
   constructor(public auth: Auth, private http: HttpClient) {}
 
@@ -52,7 +47,8 @@ export class ProfilePage implements OnInit {
   // ── PRENOTAZIONI ─────────────────────────────────────────
 
   loadBookings() {
-    this.http.get<any[]>(`${this.bookingsUrl}/mine`, { withCredentials: true })
+    // ← ENDPOINT CORRETTO: /api/prenotazioni/getOutoingPrenotazioni
+    this.http.get<any[]>(`${this.bookingsUrl}/getOutoingPrenotazioni`, { withCredentials: true })
       .subscribe({
         next: bookings => this.myBookings.set(bookings),
         error: () => {}
@@ -61,26 +57,27 @@ export class ProfilePage implements OnInit {
 
   cancelBooking(id: number) {
     if (!confirm('Annullare questa prenotazione?')) return;
-    this.http.patch(`${this.bookingsUrl}/${id}/cancel`, {}, { withCredentials: true })
+    // ← ENDPOINT CORRETTO: DELETE /api/prenotazioni/{id}
+    this.http.delete(`${this.bookingsUrl}/${id}`, { withCredentials: true })
       .subscribe(() => this.loadBookings());
   }
 
   bookingStatusLabel(status: string): string {
     const map: Record<string, string> = {
-      PENDING:   '⏳ In attesa',
-      CONFIRMED: '✅ Confermata',
-      COMPLETED: '🏁 Completata',
-      CANCELLED: '❌ Annullata',
+      'Creato':     '⏳ In attesa',
+      'Confermato': '✅ Confermata',
+      'Completato': '🏁 Completata',
+      'Cancellata': '❌ Annullata',
     };
     return map[status] ?? status;
   }
 
   bookingStatusClass(status: string): string {
     const map: Record<string, string> = {
-      PENDING:   'status-pending',
-      CONFIRMED: 'status-confirmed',
-      COMPLETED: 'status-completed',
-      CANCELLED: 'status-cancelled',
+      'Creato':     'status-pending',
+      'Confermato': 'status-confirmed',
+      'Completato': 'status-completed',
+      'Cancellata': 'status-cancelled',
     };
     return map[status] ?? '';
   }
@@ -110,9 +107,7 @@ export class ProfilePage implements OnInit {
     if (input.files && input.files[0]) {
       this.selectedFile = input.files[0];
       const reader = new FileReader();
-      reader.onload = (e) => {
-        this.previewUrl = e.target?.result as string;
-      };
+      reader.onload = (e) => { this.previewUrl = e.target?.result as string; };
       reader.readAsDataURL(this.selectedFile);
     }
   }

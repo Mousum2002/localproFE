@@ -1,25 +1,23 @@
-export interface PortalUser
-{
+export interface PortalUser {
     id?: number;
-    userName: string; // aggiunto durante creazione AdminPage.ts
+    userName: string;
     firstName: string;
     lastName: string;
     email: string;
     password: string;
     address: string;
     city: string;
-    bio: string
+    bio: string;
     x: number;
     y: number;
     roles: string[];
-    banned: boolean;  //aggiunto durante la creazione di AdminPage.ts
+    isBanned: boolean;        // FIX: era 'banned' → il backend manda 'isBanned'
     reviews: Review[];
     operationProvided: OperationTypeByVendor[];
-    profileImage?: string;  //aggiunto durante la creazione di AdminPage.ts
+    profileImage?: string;
 }
 
-export interface Review
-{
+export interface Review {
     id?: number;
     userId: number;
     rating: number;
@@ -32,8 +30,7 @@ export enum Status {
     PENDING = 'PENDING'
 }
 
-export interface OperationType
-{
+export interface OperationType {
     id?: number;
     userId: number;
     name: string;
@@ -41,11 +38,9 @@ export interface OperationType
     description: string;
     status: Status;
     operationProvided: OperationTypeByVendor[];
-
 }
 
-export interface OperationTypeByVendor
-{
+export interface OperationTypeByVendor {
     id?: number;
     portalUser: PortalUser;
     operationType: OperationType;

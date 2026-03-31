@@ -12,13 +12,13 @@ import { Auth } from '../auth';
 })
 export class ServicePage implements OnInit {
 
-  allServices = signal<any[]>([]);
+  allServices      = signal<any[]>([]);
   filteredServices = signal<any[]>([]);
-  categories = signal<string[]>([]);
+  categories       = signal<string[]>([]);
 
   selectedCategory = '';
-  cityFilter = '';
-  searchText = '';
+  cityFilter       = '';
+  searchText       = '';
 
   constructor(private http: HttpClient, public auth: Auth) {}
 
@@ -31,8 +31,6 @@ export class ServicePage implements OnInit {
       .subscribe(services => {
         this.allServices.set(services);
         this.filteredServices.set(services);
-
-        // estrai categorie uniche
         const cats = [...new Set(
           services.map((s: any) => s.category).filter((c: any) => !!c)
         )] as string[];
@@ -42,24 +40,15 @@ export class ServicePage implements OnInit {
 
   filter() {
     let result = this.allServices();
-
-    if (this.selectedCategory) {
+    if (this.selectedCategory)
       result = result.filter(s => s.category === this.selectedCategory);
-    }
-
-    if (this.cityFilter.trim()) {
-      result = result.filter(s =>
-        s.city?.toLowerCase().includes(this.cityFilter.toLowerCase())
-      );
-    }
-
-    if (this.searchText.trim()) {
+    if (this.cityFilter.trim())
+      result = result.filter(s => s.city?.toLowerCase().includes(this.cityFilter.toLowerCase()));
+    if (this.searchText.trim())
       result = result.filter(s =>
         s.userName?.toLowerCase().includes(this.searchText.toLowerCase()) ||
         s.description?.toLowerCase().includes(this.searchText.toLowerCase())
       );
-    }
-
     this.filteredServices.set(result);
   }
 
@@ -68,13 +57,17 @@ export class ServicePage implements OnInit {
   }
 
   bookService(serviceId: number) {
-  if (!this.isLoggedIn) return;
-  this.http.post('http://localhost:8080/api/prenotazioni',
-    { serviceId: serviceId },
-    { withCredentials: true }
-  ).subscribe({
-    next: () => alert('Prenotazione effettuata con successo!'),
-    error: () => alert('Errore durante la prenotazione.')
-  });
-}
+    if (!this.isLoggedIn) return;
+
+    // BUG FIX: endpoint era /api/bookings → corretto in /api/prenotazioni
+    //          campo era operationByVendorId → corretto in serviceId
+    this.http.post(
+      'http://localhost:8080/api/prenotazioni',
+      { serviceId, note: '' },
+      { withCredentials: true }
+    ).subscribe({
+      next: () => alert('Prenotazione effettuata con successo!'),
+      error: () => alert('Errore durante la prenotazione. Riprova.'),
+    });
+  }
 }

@@ -370,3 +370,38 @@
   .item-actions { flex-direction: row; align-items: center; }
   .section-header-row { flex-direction: column; align-items: flex-start; }
 }
+
+
+.item-description {
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+ 
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  padding: 0.2rem 0.6rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.5);
+  white-space: nowrap;
+}
+ 
+.price-chip {
+  background: rgba(37,168,101,0.1);
+  border-color: rgba(37,168,101,0.25);
+  color: #4dd98a;
+  font-weight: 600;
+}
+ 
