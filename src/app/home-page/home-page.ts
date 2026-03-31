@@ -12,21 +12,20 @@ import { OperationType } from '../model/entities';
 export class HomePage implements OnInit {
 
   operationTypes = signal<OperationType[]>([]);
-  totalVendors   = signal<number>(0);
+  totalServices   = signal<number>(0);
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    // withCredentials: true — necessario perché /api/operation-types richiede sessione
-    this.http.get<OperationType[]>('http://localhost:8080/api/operation-types', { withCredentials: true })
-      .subscribe(types => this.operationTypes.set(types.slice(0, 6)));
 
-    this.http.get<any[]>('http://localhost:8080/public')
-      .subscribe(users => {
-        this.totalVendors.set(users.filter(u =>
-          !u.roles?.includes('ADMIN') && !u.roles?.includes('ROLE_ADMIN')
-        ).length);
-      });
+    this.http.get<any[]>('http://localhost:8080/public/allOperationList')
+    .subscribe(operations => {
+      // Imposta il totale basandoti sulla lunghezza dell'array ricevuto
+      this.totalServices.set(operations.length);
+
+      const preview = operations.slice(0, 6);
+      this.operationTypes.set(preview);
+    });
   }
 
   scrollToHowItWorks() {

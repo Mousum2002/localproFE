@@ -263,3 +263,266 @@
   object-fit: cover; /* Mantiene le proporzioni tagliando gli eccessi */
   display: block;
 }
+/* ===================== MODAL ===================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-panel {
+  background: #1a2e22;
+  border: 1px solid rgba(37,168,101,0.25);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modal-panel::-webkit-scrollbar { width: 5px; }
+.modal-panel::-webkit-scrollbar-track { background: transparent; }
+.modal-panel::-webkit-scrollbar-thumb { background: rgba(37,168,101,0.3); border-radius: 10px; }
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+.modal-close:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* PROFILO */
+.modal-profile {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.modal-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(37,168,101,0.12);
+  border: 2px solid rgba(37,168,101,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Georgia', serif;
+  font-size: 1.6rem;
+  color: #25a865;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.modal-identity { flex: 1; }
+
+.modal-name {
+  font-family: 'Georgia', serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: #ffffff;
+  margin: 0 0 0.2rem;
+}
+
+.modal-username {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: #25a865;
+  margin-bottom: 0.3rem;
+}
+
+.modal-city {
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 0.4rem;
+}
+
+.modal-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+.modal-rating span { font-size: 1rem; color: rgba(255,255,255,0.15); }
+.modal-rating span.filled { color: #f0c040; }
+.modal-rating-num {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  margin-left: 0.4rem;
+}
+
+.modal-bio {
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.7;
+  margin: 0 0 1.25rem;
+}
+
+.modal-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+  margin: 1.25rem 0;
+}
+
+.modal-section-title {
+  font-family: 'Georgia', serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.6);
+  margin: 0 0 1rem;
+  letter-spacing: 0.03em;
+}
+
+/* SERVIZI NEL MODAL */
+.modal-services {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.modal-service-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(37,168,101,0.12);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.modal-service-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.modal-service-category {
+  background: rgba(37,168,101,0.1);
+  border: 1px solid rgba(37,168,101,0.25);
+  color: #4dd98a;
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+}
+
+.modal-service-price {
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  color: #25a865;
+}
+
+.modal-service-desc {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.6;
+  margin: 0 0 0.85rem;
+}
+
+.btn-book-modal {
+  background: #25a865;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+}
+.btn-book-modal:hover { background: #1a7a4a; }
+
+.btn-book-login-modal {
+  display: block;
+  text-align: center;
+  background: transparent;
+  border: 1px solid rgba(37,168,101,0.3);
+  color: rgba(255,255,255,0.4);
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-book-login-modal:hover { border-color: #25a865; color: #25a865; }
+
+.modal-no-services {
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.25);
+}
+
+/* RECENSIONI */
+.modal-reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modal-review {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.modal-review-header {
+  margin-bottom: 0.4rem;
+}
+
+.modal-review-stars span { font-size: 0.9rem; color: rgba(255,255,255,0.15); }
+.modal-review-stars span.filled { color: #f0c040; }
+
+.modal-review-text {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* CARD CLICKABLE CURSOR */
+.service-card { cursor: pointer; }
+
+@media (max-width: 600px) {
+  .modal-panel { padding: 1.5rem; }
+  .modal-profile { flex-direction: column; align-items: center; text-align: center; }
+  .modal-rating { justify-content: center; }
+}

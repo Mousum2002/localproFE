@@ -2,7 +2,7 @@
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-content">
-    <div class="badge">🇮🇹 Professionisti locali verificati</div>
+    <div class="badge">🇮🇹 Professionisti locali</div>
     <h1 class="hero-title">
       Il professionista giusto,<br>
       <span class="accent">nel tuo quartiere.</span>
@@ -14,22 +14,17 @@
     <div class="hero-actions">
       <a routerLink="/servizi" class="btn-primary">Cerca i servizi disponbili </a>
       <!-- scroll alla sezione "Come funziona" nella stessa pagina -->
-      <button class="btn-ghost" (click)="scrollToHowItWorks()">Scopri come funziona →</button>
+    
     </div>
     <div class="hero-stats">
       <div class="stat">
-        <span class="stat-number">{{ totalVendors() }}</span>
-        <span class="stat-label">Professionisti</span>
+        <span class="stat-number">{{ totalServices() }}+</span>
+        <span class="stat-label">Servizi offerti</span>
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <span class="stat-number">{{ operationTypes().length }}+</span>
+        <span class="stat-number">50+</span>
         <span class="stat-label">Categorie</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat">
-        <span class="stat-number">100%</span>
-        <span class="stat-label">Verificati</span>
       </div>
     </div>
   </div>
@@ -49,6 +44,9 @@
       <span>Falegname esperto</span>
       <span class="card-rating">★ 5.0</span>
     </div>
+    <div class="floating-card card-4">
+      <span><div class="btn-ghost" (click)="scrollToHowItWorks()">Scopri come funziona ↓</div></span>
+    </div>
   </div>
 </section>
 
@@ -62,10 +60,10 @@
 
     <div class="categories-grid">
       @for (type of operationTypes(); track type.id) {
-        <a routerLink="/professionisti" class="category-card">
+        <a [routerLink]="['/servizi']" [queryParams]="{ categoria: type.name }" class="category-card">
           <div class="category-icon">🛠️</div>
           <div class="category-name">{{ type.name }}</div>
-          <div class="category-desc">{{ type.description }}...</div>
+          <div class="category-desc">{{ type.description }}</div>
           <div class="category-arrow">→</div>
         </a>
       }
@@ -75,7 +73,7 @@
     </div>
 
     <div class="section-cta">
-      <a routerLink="/professionisti" class="btn-primary">Vedi tutti i professionisti</a>
+      <a routerLink="/servizi" class="btn-primary">Vedi tutti i servizi</a>
     </div>
   </div>
 </section>

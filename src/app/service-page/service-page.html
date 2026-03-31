@@ -33,7 +33,7 @@
 
   <div class="services-grid">
     @for (s of filteredServices(); track s.id) {
-      <div class="service-card">
+      <div class="service-card" (click)="openVendorProfile(s.userId)">
 
         <div class="card-top">
           <div class="card-avatar">
@@ -59,19 +59,16 @@
         <div class="card-footer">
           <div class="card-meta">
             @if (s.ratingAvg > 0) {
-              <span class="card-rating">
-                ★ {{ s.ratingAvg }}/5
-              </span>
+              <span class="card-rating">★ {{ s.ratingAvg }}/5</span>
             }
             <span class="card-price">{{ s.price }}€</span>
           </div>
-
           @if (isLoggedIn) {
-            <button class="btn-book" (click)="bookService(s.id)">
+            <button class="btn-book" (click)="$event.stopPropagation(); bookService(s.id)">
               Prenota
             </button>
           } @else {
-            <a routerLink="/login" class="btn-book-login">
+            <a routerLink="/login" class="btn-book-login" (click)="$event.stopPropagation()">
               Accedi per prenotare
             </a>
           }
@@ -89,3 +86,98 @@
   </div>
 
 </div>
+
+<!-- ===================== MODAL VENDOR PROFILE ===================== -->
+@if (selectedVendor()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+
+      <button class="modal-close" (click)="closeModal()">✕</button>
+
+      <!-- PROFILO UTENTE -->
+      <div class="modal-profile">
+        <div class="modal-avatar">
+          @if (selectedVendor().profileImage) {
+            <img [src]="selectedVendor().profileImage" alt="avatar" />
+          } @else {
+            {{ selectedVendor().userName?.[0]?.toUpperCase() ?? '?' }}
+          }
+        </div>
+        <div class="modal-identity">
+          <h2 class="modal-name">
+            {{ selectedVendor().firstName }} {{ selectedVendor().lastName }}
+          </h2>
+          <div class="modal-username">@{{ selectedVendor().userName }}</div>
+          @if (selectedVendor().city) {
+            <div class="modal-city">📍 {{ selectedVendor().city }}</div>
+          }
+          @if (selectedVendor().ratingAvg > 0) {
+            <div class="modal-rating">
+              @for (star of [1,2,3,4,5]; track star) {
+                <span [class.filled]="star <= selectedVendor().ratingAvg">★</span>
+              }
+              <span class="modal-rating-num">{{ selectedVendor().ratingAvg }}/5</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (selectedVendor().bio) {
+        <p class="modal-bio">{{ selectedVendor().bio }}</p>
+      }
+
+      <div class="modal-divider"></div>
+
+      <!-- SERVIZI DEL VENDOR -->
+      <h3 class="modal-section-title">Servizi offerti</h3>
+
+      @if (selectedVendor().services?.length === 0) {
+        <p class="modal-no-services">Nessun servizio disponibile al momento.</p>
+      } @else {
+        <div class="modal-services">
+          @for (svc of selectedVendor().services; track svc.id) {
+            <div class="modal-service-card">
+              <div class="modal-service-top">
+                <span class="modal-service-category">{{ svc.category }}</span>
+                <span class="modal-service-price">{{ svc.price }}€</span>
+              </div>
+              <p class="modal-service-desc">{{ svc.description }}</p>
+              @if (isLoggedIn) {
+                <button class="btn-book-modal" (click)="bookService(svc.id)">
+                  Prenota questo servizio
+                </button>
+              } @else {
+                <a routerLink="/login" class="btn-book-login-modal" (click)="closeModal()">
+                  Accedi per prenotare
+                </a>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- RECENSIONI -->
+      @if (selectedVendor().reviews?.length > 0) {
+        <div class="modal-divider"></div>
+        <h3 class="modal-section-title">Recensioni</h3>
+        <div class="modal-reviews">
+          @for (rev of selectedVendor().reviews; track rev.id) {
+            <div class="modal-review">
+              <div class="modal-review-header">
+                <span class="modal-review-stars">
+                  @for (star of [1,2,3,4,5]; track star) {
+                    <span [class.filled]="star <= rev.rating">★</span>
+                  }
+                </span>
+              </div>
+              @if (rev.description) {
+                <p class="modal-review-text">{{ rev.description }}</p>
+              }
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  </div>
+}
