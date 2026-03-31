@@ -1,16 +1,18 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { DatePipe } from '@angular/common';
 import { Auth } from '../auth';
 
 @Component({
   selector: 'app-profile-page',
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe],
   templateUrl: './profile-page.html',
   styleUrl: './profile-page.css',
 })
 export class ProfilePage implements OnInit {
 
+  // dati profilo
   firstName = '';
   lastName = '';
   bio = '';
@@ -18,20 +20,19 @@ export class ProfilePage implements OnInit {
   selectedFile: File | null = null;
   previewUrl: string | null = null;
 
-  operationTypes = signal<any[]>([]);
-  myServices     = signal<any[]>([]);
-  newServiceTypeId: number | string = '';
-  newServicePrice: number = 0;
+  // prenotazioni fatte da me
+  myBookings = signal<any[]>([]);
 
-  loading        = signal(false);
-  success        = signal(false);
-  error          = signal('');
-  serviceError   = signal('');
-  serviceSuccess = signal(false);
+  // servizi che offro
+  myServices = signal<any[]>([]);
 
-  private apiUrl     = 'http://localhost:8080/api/users';
-  private vendorUrl  = 'http://localhost:8080/api/vendor-operations';
-  private opTypesUrl = 'http://localhost:8080/api/operation-types';
+  loading = signal(false);
+  success = signal(false);
+  error = signal('');
+
+  private apiUrl      = 'http://localhost:8080/api/users';
+  private bookingsUrl = 'http://localhost:8080/api/bookings';
+  private vendorUrl   = 'http://localhost:8080/api/vendor-operations';
 
   constructor(public auth: Auth, private http: HttpClient) {}
 
@@ -43,65 +44,79 @@ export class ProfilePage implements OnInit {
       this.bio             = user.bio          ?? '';
       this.profileImageUrl = user.profileImage ?? '';
     }
-
-    this.http.get<any[]>(this.opTypesUrl, { withCredentials: true })
-      .subscribe(types => this.operationTypes.set(types));
-
+    this.loadBookings();
     this.loadMyServices();
   }
+
+  // ── PRENOTAZIONI ─────────────────────────────────────────
+
+  loadBookings() {
+    this.http.get<any[]>(`${this.bookingsUrl}/mine`, { withCredentials: true })
+      .subscribe({
+        next: bookings => this.myBookings.set(bookings),
+        error: () => {}
+      });
+  }
+
+  cancelBooking(id: number) {
+    if (!confirm('Annullare questa prenotazione?')) return;
+    this.http.patch(`${this.bookingsUrl}/${id}/cancel`, {}, { withCredentials: true })
+      .subscribe(() => this.loadBookings());
+  }
+
+  bookingStatusLabel(status: string): string {
+    const map: Record<string, string> = {
+      PENDING:   '⏳ In attesa',
+      CONFIRMED: '✅ Confermata',
+      COMPLETED: '🏁 Completata',
+      CANCELLED: '❌ Annullata',
+    };
+    return map[status] ?? status;
+  }
+
+  bookingStatusClass(status: string): string {
+    const map: Record<string, string> = {
+      PENDING:   'status-pending',
+      CONFIRMED: 'status-confirmed',
+      COMPLETED: 'status-completed',
+      CANCELLED: 'status-cancelled',
+    };
+    return map[status] ?? '';
+  }
+
+  // ── SERVIZI OFFERTI ───────────────────────────────────────
 
   loadMyServices() {
     const userId = this.auth.currentUser()?.id;
     if (!userId) return;
     this.http.get<any[]>(`${this.vendorUrl}?vendorId=${userId}`, { withCredentials: true })
-      .subscribe(services => this.myServices.set(services));
-  }
-
-  addService() {
-    if (!this.newServiceTypeId) {
-      this.serviceError.set('Seleziona una categoria.');
-      return;
-    }
-    if (this.newServicePrice < 0) {
-      this.serviceError.set('Il prezzo non può essere negativo.');
-      return;
-    }
-    this.serviceError.set('');
-
-    // Il backend legge l'utente dal SecurityContext, non serve mandare userId
-    const body = {
-      operationTypeId: Number(this.newServiceTypeId),
-      price: this.newServicePrice,
-    };
-
-    this.http.post(this.vendorUrl, body, { withCredentials: true })
       .subscribe({
-        next: () => {
-          this.serviceSuccess.set(true);
-          this.newServiceTypeId = '';
-          this.newServicePrice  = 0;
-          this.loadMyServices();
-          setTimeout(() => this.serviceSuccess.set(false), 3000);
-        },
-        error: () => this.serviceError.set("Errore durante l'aggiunta del servizio."),
+        next: services => this.myServices.set(services),
+        error: () => {}
       });
   }
 
-  removeService(id: number) {
-    if (!confirm('Rimuovere questo servizio?')) return;
+  deleteService(id: number) {
+    if (!confirm('Eliminare questo servizio? Non sarà più visibile nella lista.')) return;
     this.http.delete(`${this.vendorUrl}/${id}`, { withCredentials: true })
       .subscribe(() => this.loadMyServices());
   }
+
+  // ── FOTO PROFILO ──────────────────────────────────────────
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       this.selectedFile = input.files[0];
       const reader = new FileReader();
-      reader.onload = (e) => { this.previewUrl = e.target?.result as string; };
+      reader.onload = (e) => {
+        this.previewUrl = e.target?.result as string;
+      };
       reader.readAsDataURL(this.selectedFile);
     }
   }
+
+  // ── SALVA PROFILO ─────────────────────────────────────────
 
   save() {
     const user = this.auth.currentUser();
@@ -120,14 +135,14 @@ export class ProfilePage implements OnInit {
       bio:          this.bio,
       city:         user.city    ?? '',
       address:      user.address ?? '',
-      x:            user.x ?? 0,
-      y:            user.y ?? 0,
+      x:            user.x       ?? 0,
+      y:            user.y       ?? 0,
       profileImage: this.previewUrl ?? this.profileImageUrl,
     };
 
-    this.http.put<any>(`${this.apiUrl}/${user.id}`, body, { withCredentials: true })
+    this.http.put(`${this.apiUrl}/${user.id}`, body, { withCredentials: true })
       .subscribe({
-        next: (updated) => {
+        next: (updated: any) => {
           this.loading.set(false);
           this.success.set(true);
           const newUser = {
@@ -148,6 +163,8 @@ export class ProfilePage implements OnInit {
       });
   }
 
+  // ── GETTERS ───────────────────────────────────────────────
+
   get initials(): string {
     const f = this.firstName?.[0]?.toUpperCase() ?? '';
     const l = this.lastName?.[0]?.toUpperCase()  ?? '';
@@ -155,6 +172,7 @@ export class ProfilePage implements OnInit {
   }
 
   get isAdmin(): boolean {
-    return this.auth.isAdmin;
+    const roles = this.auth.currentUser()?.roles ?? [];
+    return roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
   }
 }

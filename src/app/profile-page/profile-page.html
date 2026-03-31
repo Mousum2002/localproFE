@@ -1,8 +1,7 @@
 <div class="profile-container">
 
-  <!-- ── HEADER CARD ── -->
+  <!-- ── HEADER CARD ─────────────────────────────────────── -->
   <div class="profile-header-card">
-
     <div class="avatar-wrapper">
       <div class="avatar" (click)="fileInput.click()">
         @if (previewUrl || profileImageUrl) {
@@ -15,7 +14,6 @@
       <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
       <p class="avatar-hint">Clicca per cambiare foto</p>
     </div>
-
     <div class="header-info">
       <h1 class="username">{{ auth.currentUser()?.userName }}</h1>
       <span class="email">{{ auth.currentUser()?.email }}</span>
@@ -25,27 +23,26 @@
         <span class="badge-user">Utente</span>
       }
     </div>
-
   </div>
 
-  <!-- ── FORM MODIFICA PROFILO ── -->
+  <!-- ── MODIFICA PROFILO ──────────────────────────────────── -->
   <div class="form-card">
     <h2 class="form-title">Modifica Profilo</h2>
 
     <div class="form-row">
       <div class="form-group">
         <label for="firstName">Nome</label>
-        <input id="firstName" class="form-input" type="text" [(ngModel)]="firstName" placeholder="Il tuo nome" />
+        <input id="firstName" type="text" [(ngModel)]="firstName" placeholder="Il tuo nome" />
       </div>
       <div class="form-group">
         <label for="lastName">Cognome</label>
-        <input id="lastName" class="form-input" type="text" [(ngModel)]="lastName" placeholder="Il tuo cognome" />
+        <input id="lastName" type="text" [(ngModel)]="lastName" placeholder="Il tuo cognome" />
       </div>
     </div>
 
     <div class="form-group">
       <label for="bio">Bio</label>
-      <textarea id="bio" class="form-input" [(ngModel)]="bio" rows="4"
+      <textarea id="bio" [(ngModel)]="bio" rows="4"
         placeholder="Scrivi qualcosa su di te..." maxlength="300"></textarea>
       <span class="char-count">{{ bio.length }}/300</span>
     </div>
@@ -63,42 +60,85 @@
     </button>
   </div>
 
-  <!-- ── SEZIONE SERVIZI OFFERTI ── -->
+  <!-- ── SERVIZI PRENOTATI ─────────────────────────────────── -->
   <div class="form-card">
-    <h2 class="form-title">I miei servizi</h2>
-    <p class="form-sub">Aggiungi i servizi che offri come professionista</p>
+    <h2 class="form-title">Servizi Prenotati</h2>
+    <p class="section-sub">I servizi che hai prenotato da altri professionisti</p>
 
-    @if (myServices().length) {
-      <div class="services-list">
-        @for (s of myServices(); track s.id) {
-          <div class="service-row">
-            <span class="service-name">{{ s.operationType?.name }}</span>
-            <span class="service-price">{{ s.price }}€</span>
-            <button class="btn-remove" (click)="removeService(s.id)">✕</button>
+    @if (myBookings().length === 0) {
+      <div class="empty-section">
+        <span>📋</span>
+        <p>Nessuna prenotazione effettuata</p>
+        <a href="/servizi" class="link-action">Esplora i servizi →</a>
+      </div>
+    } @else {
+      <div class="items-list">
+        @for (b of myBookings(); track b.id) {
+          <div class="item-row" [class.item-cancelled]="b.status === 'CANCELLED'">
+            <div class="item-info">
+              <div class="item-name">{{ b.operationTypeName }}</div>
+              <div class="item-meta">
+                <span>👤 {{ b.vendorUserName }}</span>
+                <span>💶 {{ b.price }}€</span>
+                @if (b.requestedAt) {
+                  <span>📅 {{ b.requestedAt | date:'dd/MM/yyyy' }}</span>
+                }
+              </div>
+              @if (b.notes) {
+                <div class="item-notes">{{ b.notes }}</div>
+              }
+            </div>
+            <div class="item-actions">
+              <span class="status-badge" [class]="bookingStatusClass(b.status)">
+                {{ bookingStatusLabel(b.status) }}
+              </span>
+              @if (b.status !== 'CANCELLED' && b.status !== 'COMPLETED') {
+                <button class="btn-cancel" (click)="cancelBooking(b.id)">
+                  Annulla
+                </button>
+              }
+            </div>
           </div>
         }
       </div>
-    } @else {
-      <p class="empty-services">Nessun servizio associato al tuo profilo.</p>
     }
+  </div>
 
-    <div class="add-service-form">
-      <select class="form-input" [(ngModel)]="newServiceTypeId">
-        <option value="">Scegli una categoria...</option>
-        @for (type of operationTypes(); track type.id) {
-          <option [value]="type.id">{{ type.name }}</option>
-        }
-      </select>
-      <input class="form-input" type="number" min="0"
-        placeholder="Prezzo (€)" [(ngModel)]="newServicePrice" />
-      <button class="btn-add-service" (click)="addService()">+ Aggiungi</button>
+  <!-- ── I MIEI SERVIZI ────────────────────────────────────── -->
+  <div class="form-card">
+    <div class="section-header-row">
+      <div>
+        <h2 class="form-title">I miei Servizi</h2>
+        <p class="section-sub">I servizi che offri come professionista</p>
+      </div>
+      <a href="/create-service" class="btn-add-service">+ Aggiungi</a>
     </div>
 
-    @if (serviceError()) {
-      <p class="msg-error">❌ {{ serviceError() }}</p>
-    }
-    @if (serviceSuccess()) {
-      <p class="msg-success">✅ Servizio aggiunto!</p>
+    @if (myServices().length === 0) {
+      <div class="empty-section">
+        <span>🔧</span>
+        <p>Nessun servizio creato</p>
+        <a href="/create-service" class="link-action">Crea il tuo primo servizio →</a>
+      </div>
+    } @else {
+      <div class="items-list">
+        @for (s of myServices(); track s.id) {
+          <div class="item-row">
+            <div class="item-info">
+              <div class="item-name">{{ s.operationType?.name }}</div>
+              <div class="item-meta">
+                <span>📝 {{ s.operationType?.description }}</span>
+                <span class="item-price">💶 {{ s.price }}€</span>
+              </div>
+            </div>
+            <div class="item-actions">
+              <button class="btn-delete-service" (click)="deleteService(s.id)">
+                🗑 Elimina
+              </button>
+            </div>
+          </div>
+        }
+      </div>
     }
   </div>
 

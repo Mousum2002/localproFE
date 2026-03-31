@@ -36,10 +36,13 @@ export class CreateServicePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Carica le categorie esistenti per i suggerimenti
-    this.http.get<any[]>(this.opTypesUrl, { withCredentials: true })
-      .subscribe({ next: types => this.existingTypes.set(types) });
+  if (!this.auth.isLoggedIn()) {
+    this.router.navigate(['/login']);
+    return;
   }
+  this.http.get<any[]>(this.opTypesUrl, { withCredentials: true })
+    .subscribe({ next: types => this.existingTypes.set(types) });
+}
 
   // Suggerimenti filtrati mentre si digita
   get suggestions(): any[] {

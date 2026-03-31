@@ -10,7 +10,6 @@ import { Auth } from './auth';
       <a routerLink="/" class="nav-logo">LocalPro</a>
       <div class="nav-links">
         <a routerLink="/">Home</a>
-        <a routerLink="/professionisti">Professionisti</a>
         <a routerLink="/servizi">Servizi</a>
         @if (auth.isLoggedIn()) {
           @if (auth.isAdmin) {
