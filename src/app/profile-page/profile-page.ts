@@ -33,6 +33,7 @@ export class ProfilePage implements OnInit {
   private apiUrl      = 'http://localhost:8080/api/users';
   private bookingsUrl = 'http://localhost:8080/api/bookings';
   private vendorUrl   = 'http://localhost:8080/api/vendor-operations';
+  private bookingsUrl = 'http://localhost:8080/api/prenotazioni';
 
   constructor(public auth: Auth, private http: HttpClient) {}
 

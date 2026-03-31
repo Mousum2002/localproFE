@@ -68,13 +68,13 @@ export class ServicePage implements OnInit {
   }
 
   bookService(serviceId: number) {
-    if (!this.isLoggedIn) return;
-    this.http.post('http://localhost:8080/api/bookings',
-      { operationByVendorId: serviceId, notes: '' },
-      { withCredentials: true }
-    ).subscribe({
-      next: () => alert('Prenotazione effettuata con successo!'),
-      error: () => alert('Errore durante la prenotazione.')
-    });
-  }
+  if (!this.isLoggedIn) return;
+  this.http.post('http://localhost:8080/api/prenotazioni',
+    { serviceId: serviceId },
+    { withCredentials: true }
+  ).subscribe({
+    next: () => alert('Prenotazione effettuata con successo!'),
+    error: () => alert('Errore durante la prenotazione.')
+  });
+}
 }

@@ -28,13 +28,11 @@ export class Auth {
   currentUser = signal<LoggedUser | null>(null);
   isLoggedIn  = signal<boolean>(false);
 
-  login(userName: string, password: string): Observable<LoggedUser[]> {
+  login(userName: string, password: string): Observable<any> {
     const body = new URLSearchParams();
     body.set('username', userName);
     body.set('password', password);
 
-    // switchMap: aspetta il login, poi carica il profilo, poi emette
-    // così login-page riceve next() SOLO dopo che currentUser è impostato
     return this.http.post(
       `${this.apiUrl}/api/auth/login`,
       body.toString(),
@@ -44,10 +42,10 @@ export class Auth {
       }
     ).pipe(
       switchMap(() =>
-        this.http.get<LoggedUser[]>(`${this.apiUrl}/public`, { withCredentials: true })
+        // carica solo i dati dell'utente loggato — funziona per tutti!
+        this.http.get<LoggedUser>(`${this.apiUrl}/api/auth/me`, { withCredentials: true })
       ),
-      tap(users => {
-        const me = users.find(u => u.userName === userName);
+      tap(me => {
         if (me) {
           this.currentUser.set(me);
           this.isLoggedIn.set(true);

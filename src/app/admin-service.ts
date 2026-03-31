@@ -14,7 +14,7 @@ export class AdminService {
    * Recupera tutti gli utenti per la dashboard
    */
   public getAllUsers(): Observable<PortalUser[]> {
-    return this.http.get<PortalUser[]>(this.adminUrl, { withCredentials: true });
+    return this.http.get<PortalUser[]>(`${this.adminUrl}/all`, { withCredentials: true });
   }
 
   /**
