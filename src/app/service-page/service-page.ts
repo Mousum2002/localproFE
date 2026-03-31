@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { Auth } from '../auth';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-service-page',
@@ -21,23 +22,40 @@ export class ServicePage implements OnInit {
   cityFilter       = '';
   searchText       = '';
 
+  map!: L.Map;
+ markersGroup = L.layerGroup();
+
+  
   constructor(private http: HttpClient, public auth: Auth) {}
 
   ngOnInit() {
-    this.loadServices();
-  }
+  this.loadServices();
+}
 
-  loadServices() {
-    this.http.get<any[]>('http://localhost:8080/public/allOperationList')
-      .subscribe(services => {
-        this.allServices.set(services);
-        this.filteredServices.set(services);
-        const cats = [...new Set(
-          services.map((s: any) => s.category).filter((c: any) => !!c)
-        )] as string[];
-        this.categories.set(cats);
-      });
-  }
+loadServices() {
+  this.http.get<any[]>('http://localhost:8080/public/allOperationList')
+    .subscribe(services => {
+      this.allServices.set(services);
+      this.filteredServices.set(services);
+      const cats = [...new Set(
+        services.map((s: any) => s.category).filter((c: any) => !!c)
+      )] as string[];
+      this.categories.set(cats);
+
+      setTimeout(() => {
+        const mapEl = document.getElementById('map');
+        console.log('map element dopo dati:', mapEl);
+        if (!mapEl || this.map) return;
+        this.map = L.map(mapEl).setView([41.9028, 12.4964], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(this.map);
+        this.markersGroup.addTo(this.map);
+        this.updateMapMarkers(services);
+      }, 500);
+
+    });
+}
 
   filter() {
     let result = this.allServices();
@@ -55,6 +73,7 @@ export class ServicePage implements OnInit {
       );
       
     this.filteredServices.set(result);
+     this.updateMapMarkers(result);
   }
 
   get isLoggedIn(): boolean {
@@ -82,5 +101,17 @@ export class ServicePage implements OnInit {
   }
 
   closeModal() { this.selectedVendor.set(null); }
+
+  updateMapMarkers(services: any[]) {
+  if (!this.map) return;
+  this.markersGroup.clearLayers();
+  services.forEach(s => {
+    if (s.x && s.y) {
+      L.marker([s.x, s.y])
+        .bindPopup(`<b>${s.userName}</b><br>${s.category}<br>${s.city}`)
+        .addTo(this.markersGroup);
+    }
+  });
+}
 
 }

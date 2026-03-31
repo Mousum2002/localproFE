@@ -31,6 +31,8 @@
     <span class="filter-count">{{ filteredServices().length }} servizi trovati</span>
   </div>
 
+<div #mapContainer id="map" style="height: 400px; width: 100%; margin-bottom: 24px; border-radius: 12px;"></div>
+
   <div class="services-grid">
     @for (s of filteredServices(); track s.id) {
       <div class="service-card" (click)="openVendorProfile(s.userId)">
