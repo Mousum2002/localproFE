@@ -70,4 +70,14 @@ export class ServicePage implements OnInit {
       error: () => alert('Errore durante la prenotazione. Riprova.'),
     });
   }
+
+  selectedVendor = signal<any | null>(null);
+
+  openVendorProfile(userId: number) {
+    this.http.get<any>(`http://localhost:8080/public/vendor/${userId}`)
+      .subscribe(profile => this.selectedVendor.set(profile));
+  }
+
+  closeModal() { this.selectedVendor.set(null); }
+
 }
