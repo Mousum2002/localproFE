@@ -39,9 +39,8 @@ export class ProfilePage implements OnInit {
   private vendorUrl   = 'http://localhost:8080/api/vendor-operations';
   private opTypesUrl  = 'http://localhost:8080/api/operation-types';
 
-  operationTypes    = signal<any[]>([]);
+  operationTypes      = signal<any[]>([]);
   editOperationTypeId = 0;
-
 
   constructor(public auth: Auth, private http: HttpClient) {}
 
@@ -55,7 +54,6 @@ export class ProfilePage implements OnInit {
     }
     this.loadBookings();
     this.loadMyServices();
-    this.loadOperationTypes();
     this.loadOperationTypes();
   }
 
@@ -137,7 +135,6 @@ export class ProfilePage implements OnInit {
       .subscribe({ next: types => this.operationTypes.set(types) });
   }
 
-
   filteredServices = computed(() => this.myServices());
 
   deleteService(id: number) {
@@ -149,7 +146,8 @@ export class ProfilePage implements OnInit {
   startEdit(service: any) {
     this.editingService.set(service);
     this.editPrice = service.price;
-    this.editOperationTypeId = service.operationTypeId;
+    this.editOperationTypeId = service.operationTypeId ?? 0;
+    // Il DTO ha campi piatti: operationTypeName, operationTypeDescription
     this.editDescription = service.operationTypeDescription ?? '';
   }
 
@@ -168,7 +166,7 @@ export class ProfilePage implements OnInit {
         this.editingService.set(null);
         this.myServices.update(list =>
           list.map(s => s.id === svc.id
-            ? { ...s, price: this.editPrice, operationTypeDescription: this.editDescription }
+            ? { ...s, price: this.editPrice, operationTypeDescription: this.editDescription, operationTypeId: this.editOperationTypeId, operationTypeName: this.operationTypes().find(t => t.id === this.editOperationTypeId)?.name ?? s.operationTypeName }
             : s
           )
         );
