@@ -1,5 +1,6 @@
 <div class="profile-container">
 
+  <!-- ── HEADER CARD ─────────────────────────────────────── -->
   <div class="profile-header-card">
     <div class="avatar-wrapper">
       <div class="avatar" (click)="fileInput.click()">
@@ -17,9 +18,11 @@
       <h1 class="username">{{ auth.currentUser()?.userName }}</h1>
       <div class="header-meta">
         <span class="email">{{ auth.currentUser()?.email }}</span>
-        <div class="rating-badge-mini">
-          ⭐ {{ averageRating() }} <span>({{ reviews().length }})</span>
-        </div>
+        @if (reviews().length > 0) {
+          <div class="rating-badge-mini">
+            ⭐ {{ averageRating() }} <span>({{ reviews().length }})</span>
+          </div>
+        }
       </div>
       @if (isAdmin) {
         <span class="badge-admin">👑 Admin</span>
@@ -29,9 +32,10 @@
     </div>
   </div>
 
+  <!-- ── MODIFICA PROFILO ──────────────────────────────────── -->
   <div class="form-card">
     <h2 class="form-title">Modifica Profilo</h2>
-    
+
     <div class="form-row">
       <div class="form-group">
         <label for="firstName">Nome</label>
@@ -56,7 +60,8 @@
 
     <div class="form-group">
       <label for="bio">Bio</label>
-      <textarea id="bio" [(ngModel)]="bio" rows="3" placeholder="Scrivi qualcosa su di te..." maxlength="300"></textarea>
+      <textarea id="bio" [(ngModel)]="bio" rows="3"
+        placeholder="Scrivi qualcosa su di te..." maxlength="300"></textarea>
       <span class="char-count">{{ bio?.length || 0 }}/300</span>
     </div>
 
@@ -68,16 +73,155 @@
     </button>
   </div>
 
+  <!-- ── SERVIZI PRENOTATI ─────────────────────────────────── -->
+  <div class="form-card">
+    <h2 class="form-title">Servizi Prenotati</h2>
+    <p class="section-sub">I servizi che hai prenotato da altri professionisti</p>
+
+    <div class="tab-bar">
+      @for (tab of [
+        {key:'tutti', label:'Tutti'},
+        {key:'in-attesa', label:'In attesa'},
+        {key:'confermato', label:'Confermati'},
+        {key:'completato', label:'Completati'},
+        {key:'cancellata', label:'Annullati'}
+      ]; track tab.key) {
+        <button class="tab-btn" [class.active]="bookingTab() === tab.key"
+          (click)="setBookingTab(tab.key)">
+          {{ tab.label }}
+          @if (bookingTabCount(tab.key) > 0) {
+            <span class="tab-count">{{ bookingTabCount(tab.key) }}</span>
+          }
+        </button>
+      }
+    </div>
+
+    @if (filteredBookings().length === 0) {
+      <div class="empty-section">
+        <span>📋</span>
+        <p>Nessuna prenotazione in questa categoria</p>
+        @if (bookingTab() === 'tutti') {
+          <a href="/servizi" class="link-action">Esplora i servizi →</a>
+        }
+      </div>
+    } @else {
+      <div class="items-list">
+        @for (b of filteredBookings(); track b.id) {
+          <div class="item-row" [class.item-cancelled]="b.status === 'Cancellata'">
+            <div class="item-info">
+              <div class="item-name">{{ b.serviceOperationName }}</div>
+              @if (b.serviceDescription) {
+                <div class="item-description">{{ b.serviceDescription }}</div>
+              }
+              <div class="item-meta">
+                <span class="meta-chip">👤 {{ b.vendorUserName }}</span>
+                <span class="meta-chip price-chip">💶 {{ b.servicePrice }}€</span>
+                @if (b.reservationDate) {
+                  <span class="meta-chip">📅 {{ b.reservationDate | date:'dd/MM/yyyy HH:mm' }}</span>
+                }
+              </div>
+              @if (b.note) {
+                <div class="item-notes">📝 {{ b.note }}</div>
+              }
+            </div>
+            <div class="item-actions">
+              <span class="status-badge" [class]="bookingStatusClass(b.status)">
+                {{ bookingStatusLabel(b.status) }}
+              </span>
+              @if (b.status !== 'Cancellata' && b.status !== 'Completato') {
+                <button class="btn-cancel" (click)="cancelBooking(b.id)">Annulla</button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── I MIEI SERVIZI ────────────────────────────────────── -->
+  <div class="form-card">
+    <div class="section-header-row">
+      <div>
+        <h2 class="form-title">I miei Servizi</h2>
+        <p class="section-sub">I servizi che offri come professionista</p>
+      </div>
+      <a href="/create-service" class="btn-add-service">+ Aggiungi</a>
+    </div>
+
+    @if (myServices().length === 0) {
+      <div class="empty-section">
+        <span>🔧</span>
+        <p>Nessun servizio creato</p>
+        <a href="/create-service" class="link-action">Crea il tuo primo servizio →</a>
+      </div>
+    } @else {
+      <div class="items-list">
+        @for (s of myServices(); track s.id) {
+
+          @if (editingService()?.id === s.id) {
+            <div class="item-row edit-mode">
+              <div class="edit-form">
+                <div class="form-group">
+                  <label class="form-label">Categoria</label>
+                  <select class="form-input-small" [(ngModel)]="editOperationTypeId">
+                    @for (type of operationTypes(); track type.id) {
+                      <option [ngValue]="type.id">{{ type.name }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Descrizione</label>
+                  <textarea class="form-input-small" rows="3"
+                    [(ngModel)]="editDescription"
+                    placeholder="Descrizione del servizio..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Prezzo (€)</label>
+                  <input class="form-input-small" type="number" min="0"
+                    [(ngModel)]="editPrice" />
+                </div>
+                <div class="edit-actions">
+                  <button class="btn-save-edit" (click)="saveEdit()" [disabled]="editSaving()">
+                    @if (editSaving()) { Salvataggio... } @else { Salva }
+                  </button>
+                  <button class="btn-cancel-edit" (click)="cancelEdit()">Annulla</button>
+                </div>
+              </div>
+            </div>
+
+          } @else {
+            <div class="item-row">
+              <div class="item-info">
+                <div class="item-name">{{ s.operationTypeName }}</div>
+                <div class="item-description">{{ s.operationTypeDescription }}</div>
+                <div class="item-meta">
+                  <span class="meta-chip price-chip">💶 {{ s.price }}€</span>
+                </div>
+              </div>
+              <div class="item-actions">
+                <button class="btn-edit-service" (click)="startEdit(s)">✏️ Modifica</button>
+                <button class="btn-delete-service" (click)="deleteService(s.id)">🗑 Elimina</button>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── RECENSIONI RICEVUTE ───────────────────────────────── -->
   <div class="form-card">
     <div class="section-header-row">
       <div>
         <h2 class="form-title">Recensioni Ricevute</h2>
         <p class="section-sub">Feedback dai tuoi clienti</p>
       </div>
-      <div class="rating-summary">
-        <span class="rating-value">{{ averageRating() }}</span>
-        <span class="rating-star">⭐</span>
-      </div>
+      @if (reviews().length > 0) {
+        <div class="rating-summary">
+          <span class="rating-value">{{ averageRating() }}</span>
+          <span class="rating-star">⭐</span>
+        </div>
+      }
     </div>
 
     @if (reviews().length === 0) {
@@ -92,10 +236,12 @@
             <div class="item-info">
               <div class="review-top-row">
                 <span class="review-stars">
-                  {{ "⭐".repeat(rev.rating) }}
+                  @for (star of [1,2,3,4,5]; track star) {
+                    <span [class.star-filled]="star <= rev.rating">★</span>
+                  }
                 </span>
                 @if (rev.createdAt) {
-                  <span class="meta-date">📅 {{ rev.createdAt | date:'dd/MM/yyyy' }}</span>
+                  <span class="meta-chip">📅 {{ rev.createdAt | date:'dd/MM/yyyy' }}</span>
                 }
               </div>
               <p class="review-text">"{{ rev.description }}"</p>
@@ -105,4 +251,5 @@
       </div>
     }
   </div>
+
 </div>

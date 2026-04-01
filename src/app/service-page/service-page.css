@@ -128,8 +128,6 @@
   font-size: 1.1rem;
   color: #25a865;
   flex-shrink: 0;
-  overflow: hidden; /* Importante per contenere l'immagine nel cerchio */
-  position: relative;
 }
 
 .card-identity { flex: 1; min-width: 0; }
@@ -255,13 +253,6 @@
   .filter-bar { flex-direction: column; align-items: stretch; }
   .filter-count { margin-left: 0; }
   .page-header { flex-direction: column; align-items: flex-start; }
-}
-
-.avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Mantiene le proporzioni tagliando gli eccessi */
-  display: block;
 }
 /* ===================== MODAL ===================== */
 .modal-overlay {
@@ -525,4 +516,104 @@
   .modal-panel { padding: 1.5rem; }
   .modal-profile { flex-direction: column; align-items: center; text-align: center; }
   .modal-rating { justify-content: center; }
+}
+
+/* ===================== MODAL PRENOTAZIONE ===================== */
+.booking-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.booking-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(37,168,101,0.12);
+  border: 2px solid rgba(37,168,101,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Georgia', serif; font-size: 1.2rem; color: #25a865;
+  flex-shrink: 0;
+}
+
+.booking-category {
+  font-family: 'Georgia', serif; font-size: 1rem; color: #fff;
+}
+
+.booking-vendor {
+  font-family: 'Courier New', monospace; font-size: 0.78rem;
+  color: #25a865; margin-top: 0.1rem;
+}
+
+.booking-city {
+  font-family: 'Courier New', monospace; font-size: 0.75rem;
+  color: rgba(255,255,255,0.35); margin-top: 0.1rem;
+}
+
+.booking-price {
+  margin-left: auto;
+  font-family: 'Georgia', serif; font-size: 1.3rem; color: #25a865;
+  flex-shrink: 0;
+}
+
+.booking-form {
+  display: flex; flex-direction: column; gap: 1rem;
+}
+
+.form-group-modal {
+  display: flex; flex-direction: column; gap: 0.4rem;
+}
+
+.form-label-modal {
+  font-family: 'Courier New', monospace; font-size: 0.75rem;
+  color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.form-input-modal {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; padding: 0.7rem 0.9rem;
+  color: #fff; font-family: 'Courier New', monospace; font-size: 0.88rem;
+  outline: none; resize: none; transition: border-color 0.2s;
+  color-scheme: dark;
+}
+.form-input-modal:focus { border-color: #25a865; }
+.form-input-modal::placeholder { color: rgba(255,255,255,0.2); }
+
+.booking-error {
+  font-family: 'Courier New', monospace; font-size: 0.82rem;
+  color: #ff6b7a; margin: 0;
+}
+
+.btn-book-modal {
+  background: #25a865; color: #fff; border: none;
+  border-radius: 10px; padding: 0.85rem;
+  font-family: 'Courier New', monospace; font-size: 0.92rem;
+  cursor: pointer; transition: background 0.2s, opacity 0.2s;
+  width: 100%;
+}
+.btn-book-modal:hover:not(:disabled) { background: #1a7a4a; }
+.btn-book-modal:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* SUCCESSO */
+.booking-success {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 1rem; padding: 1rem 0; text-align: center;
+}
+
+.success-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(37,168,101,0.15); border: 2px solid #25a865;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; color: #25a865;
+}
+
+.success-title {
+  font-family: 'Georgia', serif; font-size: 1.3rem;
+  color: #fff; margin: 0;
+}
+
+.success-sub {
+  font-family: 'Courier New', monospace; font-size: 0.82rem;
+  color: rgba(255,255,255,0.5); line-height: 1.7; margin: 0;
 }
