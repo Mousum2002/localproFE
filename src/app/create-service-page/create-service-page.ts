@@ -4,26 +4,36 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../auth';
 
+interface OperationType {
+  id: number;
+  name: string;
+  description?: string;
+  tags?: string[];
+}
+
 @Component({
   selector: 'app-create-service-page',
+  standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './create-service-page.html',
   styleUrl: './create-service-page.css',
 })
 export class CreateServicePage implements OnInit {
 
-  selectedTypeId: number | null = null;  // categoria selezionata dalla lista
-  description   = '';
-  tagsInput     = '';
+  // ✅ NUOVO MODELLO
+  selectedTypeId: number | null = null;
+  selectedType: OperationType | null = null;
+
+  description = '';
   price: number = 0;
 
-  existingTypes = signal<any[]>([]);
+  existingTypes = signal<OperationType[]>([]);
 
   loading = signal(false);
   success = signal(false);
   error   = signal('');
 
-  private opTypesUrl = 'http://localhost:8080/api/operation-types';
+  private opTypesUrl = 'http://localhost:8080/public/operation-types';
   private vendorUrl  = 'http://localhost:8080/api/vendor-operations';
 
   constructor(
@@ -37,42 +47,80 @@ export class CreateServicePage implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    this.http.get<any[]>(this.opTypesUrl, { withCredentials: true })
-      .subscribe({ next: types => this.existingTypes.set(types) });
+
+    this.http.get<OperationType[]>(this.opTypesUrl, { withCredentials: true })
+      .subscribe({
+        next: types => this.existingTypes.set(types)
+      });
   }
 
-  // quando si seleziona una categoria precompila descrizione e tag
-  onTypeSelected() {
-    const type = this.existingTypes().find(t => t.id === Number(this.selectedTypeId));
-    if (type) {
-      this.description = type.description ?? '';
-      this.tagsInput   = (type.tags ?? []).join(', ');
+  // ✅ FIX: metodo mancante
+  onTypeSelected(): void {
+    if (this.selectedTypeId === -1) {
+      this.selectedType = {
+        id: -1,
+        name: 'Altro'
+      };
+      return;
     }
-  }
 
-  get selectedType(): any {
-    return this.existingTypes().find(t => t.id === Number(this.selectedTypeId));
+    this.selectedType = this.existingTypes()
+      .find(t => t.id === this.selectedTypeId) || null;
   }
 
   create() {
     if (!this.selectedTypeId) {
-      this.error.set('Seleziona una categoria di servizio.');
+      this.error.set('Seleziona una categoria.');
       return;
     }
+
     if (!this.description.trim()) {
-      this.error.set('Inserisci una descrizione del tuo servizio.');
+      this.error.set('Inserisci una descrizione.');
       return;
     }
+
     if (this.price < 0) {
-      this.error.set('Il prezzo non può essere negativo.');
+      this.error.set('Prezzo non valido.');
       return;
     }
 
     this.loading.set(true);
     this.error.set('');
 
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) {
+      this.error.set('Utente non autenticato.');
+      this.loading.set(false);
+      return;
+    }
+
+    // ✅ CASO: categoria esistente
+    if (this.selectedTypeId !== -1) {
+      this.createVendorOperation(this.selectedTypeId);
+      return;
+    }
+
+    // ✅ CASO: ALTRO → crea nuova categoria
+    const newType = {
+      userId,
+      name: this.description.substring(0, 30), // fallback semplice
+      description: this.description,
+      tags: [this.description.split(' ')[0]]
+    };
+
+    this.http.post<any>(this.opTypesUrl, newType, { withCredentials: true })
+      .subscribe({
+        next: created => this.createVendorOperation(created.id),
+        error: () => {
+          this.loading.set(false);
+          this.error.set('Errore creazione categoria.');
+        }
+      });
+  }
+
+  private createVendorOperation(operationTypeId: number) {
     this.http.post(this.vendorUrl,
-      { operationTypeId: Number(this.selectedTypeId), price: this.price },
+      { operationTypeId, price: this.price },
       { withCredentials: true }
     ).subscribe({
       next: () => {
@@ -82,7 +130,7 @@ export class CreateServicePage implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.error.set('Errore durante la pubblicazione del servizio. Riprova.');
+        this.error.set('Errore pubblicazione.');
       }
     });
   }

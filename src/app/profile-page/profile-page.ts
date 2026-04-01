@@ -47,8 +47,8 @@ export class ProfilePage implements OnInit {
   private apiUrl      = 'http://localhost:8080/api/users';
   private bookingsUrl = 'http://localhost:8080/api/prenotazioni';
   private vendorUrl   = 'http://localhost:8080/api/vendor-operations';
-  private opTypesUrl  = 'http://localhost:8080/api/operation-types';
-  private reviewsUrl  = 'http://localhost:8080/api/reviews';
+  private opTypesUrl  = 'http://localhost:8080/public/operation-types';
+  private reviewsUrl  = 'http://localhost:8080/public/reviews';
 
   operationTypes      = signal<any[]>([]);
   editOperationTypeId = 0;
@@ -72,7 +72,7 @@ export class ProfilePage implements OnInit {
   }
 
   loadReviews(userName: string) {
-    this.http.get<any[]>(`${this.reviewsUrl}/vendor/${userName}`, { withCredentials: true })
+    this.http.get<any[]>(`${this.reviewsUrl}/vendor/${userName}`)
       .subscribe({ 
         next: r => {
           console.table(r);
@@ -154,7 +154,7 @@ export class ProfilePage implements OnInit {
   }
 
   loadOperationTypes() {
-    this.http.get<any[]>(this.opTypesUrl, { withCredentials: true })
+    this.http.get<any[]>(this.opTypesUrl)
       .subscribe({ next: types => this.operationTypes.set(types) });
   }
 
