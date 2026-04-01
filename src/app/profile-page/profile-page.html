@@ -20,7 +20,7 @@
         <span class="email">{{ auth.currentUser()?.email }}</span>
         @if (reviews().length > 0) {
           <div class="rating-badge-mini">
-            ⭐ {{ averageRating() }} <span>({{ reviews().length }})</span>
+            ★ {{ averageRating() }} <span>({{ reviews().length }})</span>
           </div>
         }
       </div>
@@ -219,7 +219,7 @@
       @if (reviews().length > 0) {
         <div class="rating-summary">
           <span class="rating-value">{{ averageRating() }}</span>
-          <span class="rating-star">⭐</span>
+          <span class="rating-star">★</span>
         </div>
       }
     </div>

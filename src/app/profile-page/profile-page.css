@@ -557,7 +557,7 @@
   font-size: 1rem;
 }
 
-.rating-star { font-size: 0.9rem; }
+.rating-star { font-size: 0.9rem;  color: #f0c040 !important; }
 
 /* ── RECENSIONI ── */
 .review-item {
@@ -578,7 +578,7 @@
 }
 
 .review-stars span {
-  color: rgba(255,255,255,0.2);
+  color: rgba(255, 255, 255, 0.2);
   font-size: 1rem;
   letter-spacing: 2px;
 }

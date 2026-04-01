@@ -29,7 +29,7 @@
             @for (star of starsArray; track star) {
               <span [class.star-filled]="star <= vendor().ratingAvg">★</span>
             }
-            <span class="rating-num">{{ vendor().ratingAvg }}/5</span>
+            
             <span class="review-count">({{ vendor().reviews?.length ?? 0 }} recensioni)</span>
           </div>
         }
