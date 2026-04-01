@@ -128,6 +128,7 @@
   font-size: 1.1rem;
   color: #25a865;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .card-identity { flex: 1; min-width: 0; }
@@ -616,4 +617,11 @@
 .success-sub {
   font-family: 'Courier New', monospace; font-size: 0.82rem;
   color: rgba(255,255,255,0.5); line-height: 1.7; margin: 0;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }

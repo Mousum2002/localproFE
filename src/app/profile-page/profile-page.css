@@ -315,6 +315,14 @@
   overflow: hidden;
 }
 
+.item-note {
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.35);
+  font-style: italic;
+  margin-bottom: 0.4rem;
+}
+
 .item-meta {
   display: flex;
   flex-wrap: wrap;
@@ -357,6 +365,12 @@
   border-color: rgba(37,168,101,0.25);
   color: #4dd98a;
   font-weight: 600;
+}
+
+.date-chip {
+  background: rgba(37,168,101,0.08);
+  border-color: rgba(37,168,101,0.2);
+  color: #4dd98a;
 }
 
 /* ── STATUS BADGE ── */

@@ -117,11 +117,11 @@
                 <span class="meta-chip">👤 {{ b.vendorUserName }}</span>
                 <span class="meta-chip price-chip">💶 {{ b.servicePrice }}€</span>
                 @if (b.reservationDate) {
-                  <span class="meta-chip">📅 {{ b.reservationDate | date:'dd/MM/yyyy HH:mm' }}</span>
+                  <span class="meta-chip date-chip">📅 {{ b.reservationDate | date:'dd/MM/yyyy' }} alle {{ b.reservationDate | date:'HH:mm' }}</span>
                 }
               </div>
               @if (b.note) {
-                <div class="item-notes">📝 {{ b.note }}</div>
+                <div class="item-note">📝 {{ b.note }}</div>
               }
             </div>
             <div class="item-actions">
