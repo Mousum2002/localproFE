@@ -15,6 +15,8 @@ export class ProfilePage implements OnInit {
   firstName       = '';
   lastName        = '';
   bio             = '';
+  address         = '';
+  city            = '';
   editDescription = '';
   profileImageUrl = '';
   selectedFile: File | null = null;
@@ -22,6 +24,14 @@ export class ProfilePage implements OnInit {
 
   myBookings = signal<any[]>([]);
   myServices = signal<any[]>([]);
+  reviews    = signal<any[]>([]); //AGGIUNTO
+
+  averageRating = computed(() => {
+    const revs = this.reviews();
+    if (revs.length === 0) return 0;
+    const sum = revs.reduce((acc, r) => acc + (r.rating || 0), 0);
+    return (sum / revs.length).toFixed(1);
+  });
 
   bookingTab = signal<'tutti' | 'in-attesa' | 'confermato' | 'completato' | 'cancellata'>('tutti');
   serviceTab = signal<'tutti' | 'in-attesa' | 'confermato' | 'completato' | 'cancellata'>('tutti');
@@ -38,6 +48,7 @@ export class ProfilePage implements OnInit {
   private bookingsUrl = 'http://localhost:8080/api/prenotazioni';
   private vendorUrl   = 'http://localhost:8080/api/vendor-operations';
   private opTypesUrl  = 'http://localhost:8080/api/operation-types';
+  private reviewsUrl  = 'http://localhost:8080/api/reviews';
 
   operationTypes      = signal<any[]>([]);
   editOperationTypeId = 0;
@@ -50,14 +61,26 @@ export class ProfilePage implements OnInit {
       this.firstName       = user.firstName    ?? '';
       this.lastName        = user.lastName     ?? '';
       this.bio             = user.bio          ?? '';
+      this.address         = user.address      ?? '';
+      this.city            = user.city         ?? '';
       this.profileImageUrl = user.profileImage ?? '';
+      this.loadReviews(user.userName);  //aggiunto
     }
     this.loadBookings();
     this.loadMyServices();
     this.loadOperationTypes();
   }
 
-  // ── PRENOTAZIONI ─────────────────────────────────────────
+  loadReviews(userName: string) {
+    this.http.get<any[]>(`${this.reviewsUrl}/vendor/${userName}`, { withCredentials: true })
+      .subscribe({ 
+        next: r => {
+          console.table(r);
+          this.reviews.set(r);
+        },
+        error: () => console.error("Errore caricamento recensioni")
+      });
+  }
 
   loadBookings() {
     this.http.get<any[]>(`${this.bookingsUrl}/getOutoingPrenotazioni`, { withCredentials: true })
@@ -197,11 +220,18 @@ export class ProfilePage implements OnInit {
     this.error.set('');
     this.success.set(false);
 
+    // FIX: Ora usiamo 'this.city' e 'this.address' (i valori legati agli input)
     const body: any = {
-      userName: user.userName, email: user.email, password: 'UNCHANGED',
-      firstName: this.firstName, lastName: this.lastName, bio: this.bio,
-      city: user.city ?? '', address: user.address ?? '',
-      x: user.x ?? 0, y: user.y ?? 0,
+      userName: user.userName, 
+      email: user.email, 
+      password: 'UNCHANGED',
+      firstName: this.firstName, 
+      lastName: this.lastName, 
+      bio: this.bio,
+      city: this.city,       // <-- Prende il valore dall'input
+      address: this.address, // <-- Prende il valore dall'input
+      x: user.x ?? 0, 
+      y: user.y ?? 0,
       profileImage: this.previewUrl || this.profileImageUrl,
     };
 
@@ -210,14 +240,31 @@ export class ProfilePage implements OnInit {
         next: (updated: any) => {
           this.loading.set(false);
           this.success.set(true);
-          const newUser = { ...user, bio: updated.bio, firstName: updated.firstName, lastName: updated.lastName, profileImage: updated.profileImage };
+
+          // Aggiorniamo l'oggetto utente globale con tutti i nuovi campi
+          const newUser = { 
+            ...user, 
+            firstName: updated.firstName,
+            lastName: updated.lastName,
+            bio: updated.bio, 
+            city: updated.city,       // <-- Aggiornato
+            address: updated.address, // <-- Aggiornato
+            profileImage: updated.profileImage 
+          };
+
+          // Sincronizziamo il segnale di Auth e la sessione
           this.auth.currentUser.set(newUser);
           sessionStorage.setItem('user', JSON.stringify(newUser));
+          
           this.previewUrl = null;
           this.profileImageUrl = updated.profileImage;
+          
           setTimeout(() => this.success.set(false), 3000);
         },
-        error: () => { this.loading.set(false); this.error.set('Salvataggio fallito. Riprova.'); },
+        error: () => { 
+          this.loading.set(false); 
+          this.error.set('Salvataggio fallito. Riprova.'); 
+        },
       });
   }
 
