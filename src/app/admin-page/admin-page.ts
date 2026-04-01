@@ -100,9 +100,14 @@ export class AdminPage implements OnInit {
     }
   }
 
-  private updateLocalUser(updatedUser: PortalUser): void {
+  private updateLocalUser(updatedUser: any): void {
+    // il backend manda 'banned', l'entity usa 'isBanned' → normalizziamo
+    const normalized: PortalUser = {
+      ...updatedUser,
+      isBanned: updatedUser.isBanned ?? updatedUser.banned ?? false,
+    };
     this.users.update(list =>
-      list.map(u => (u.id === updatedUser.id ? updatedUser : u))
+      list.map(u => (u.id === normalized.id ? normalized : u))
     );
   }
 
