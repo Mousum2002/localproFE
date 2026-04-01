@@ -9,33 +9,25 @@
   </div>
 
   <div class="filter-bar">
-    <input class="filter-input" type="text"
-      placeholder="🔍 Cerca per nome o descrizione..."
-      [(ngModel)]="searchText"
-      (ngModelChange)="filter()" />
-
-    <select class="filter-select"
-      [(ngModel)]="selectedCategory"
-      (ngModelChange)="filter()">
+    <input class="filter-input" type="text" placeholder="🔍 Cerca per nome o descrizione..."
+      [(ngModel)]="searchText" (ngModelChange)="filter()" />
+    <select class="filter-select" [(ngModel)]="selectedCategory" (ngModelChange)="filter()">
       <option value="">Tutte le categorie</option>
       @for (cat of categories(); track cat) {
         <option [value]="cat">{{ cat }}</option>
       }
     </select>
-
-    <input class="filter-input" type="text"
-      placeholder="📍 Filtra per città..."
-      [(ngModel)]="cityFilter"
-      (ngModelChange)="filter()" />
-
+    <input class="filter-input" type="text" placeholder="📍 Filtra per città..."
+      [(ngModel)]="cityFilter" (ngModelChange)="filter()" />
     <span class="filter-count">{{ filteredServices().length }} servizi trovati</span>
   </div>
 
-<div #mapContainer id="map" style="height: 400px; width: 100%; margin-bottom: 24px; border-radius: 12px;"></div>
+  <div #mapContainer id="map" style="height: 400px; width: 100%; margin-bottom: 24px; border-radius: 12px;"></div>
 
   <div class="services-grid">
     @for (s of filteredServices(); track s.id) {
-      <div class="service-card" (click)="openVendorProfile(s.userId)">
+      <!-- click sulla card → vendor page -->
+      <div class="service-card" (click)="goToVendor(s.userId)">
 
         <div class="card-top">
           <div class="card-avatar">
@@ -47,9 +39,7 @@
           </div>
           <div class="card-identity">
             <div class="card-username">{{ s.userName }}</div>
-            @if (s.city) {
-              <div class="card-city">📍 {{ s.city }}</div>
-            }
+            @if (s.city) { <div class="card-city">📍 {{ s.city }}</div> }
           </div>
           @if (s.category) {
             <span class="card-category">{{ s.category }}</span>
@@ -88,98 +78,3 @@
   </div>
 
 </div>
-
-<!-- ===================== MODAL VENDOR PROFILE ===================== -->
-@if (selectedVendor()) {
-  <div class="modal-overlay" (click)="closeModal()">
-    <div class="modal-panel" (click)="$event.stopPropagation()">
-
-      <button class="modal-close" (click)="closeModal()">✕</button>
-
-      <!-- PROFILO UTENTE -->
-      <div class="modal-profile">
-        <div class="modal-avatar">
-          @if (selectedVendor().profileImage) {
-            <img [src]="selectedVendor().profileImage" alt="avatar" />
-          } @else {
-            {{ selectedVendor().userName?.[0]?.toUpperCase() ?? '?' }}
-          }
-        </div>
-        <div class="modal-identity">
-          <h2 class="modal-name">
-            {{ selectedVendor().firstName }} {{ selectedVendor().lastName }}
-          </h2>
-          <div class="modal-username">@{{ selectedVendor().userName }}</div>
-          @if (selectedVendor().city) {
-            <div class="modal-city">📍 {{ selectedVendor().city }}</div>
-          }
-          @if (selectedVendor().ratingAvg > 0) {
-            <div class="modal-rating">
-              @for (star of [1,2,3,4,5]; track star) {
-                <span [class.filled]="star <= selectedVendor().ratingAvg">★</span>
-              }
-              <span class="modal-rating-num">{{ selectedVendor().ratingAvg }}/5</span>
-            </div>
-          }
-        </div>
-      </div>
-
-      @if (selectedVendor().bio) {
-        <p class="modal-bio">{{ selectedVendor().bio }}</p>
-      }
-
-      <div class="modal-divider"></div>
-
-      <!-- SERVIZI DEL VENDOR -->
-      <h3 class="modal-section-title">Servizi offerti</h3>
-
-      @if (selectedVendor().services?.length === 0) {
-        <p class="modal-no-services">Nessun servizio disponibile al momento.</p>
-      } @else {
-        <div class="modal-services">
-          @for (svc of selectedVendor().services; track svc.id) {
-            <div class="modal-service-card">
-              <div class="modal-service-top">
-                <span class="modal-service-category">{{ svc.category }}</span>
-                <span class="modal-service-price">{{ svc.price }}€</span>
-              </div>
-              <p class="modal-service-desc">{{ svc.description }}</p>
-              @if (isLoggedIn) {
-                <button class="btn-book-modal" (click)="bookService(svc.id)">
-                  Prenota questo servizio
-                </button>
-              } @else {
-                <a routerLink="/login" class="btn-book-login-modal" (click)="closeModal()">
-                  Accedi per prenotare
-                </a>
-              }
-            </div>
-          }
-        </div>
-      }
-
-      <!-- RECENSIONI -->
-      @if (selectedVendor().reviews?.length > 0) {
-        <div class="modal-divider"></div>
-        <h3 class="modal-section-title">Recensioni</h3>
-        <div class="modal-reviews">
-          @for (rev of selectedVendor().reviews; track rev.id) {
-            <div class="modal-review">
-              <div class="modal-review-header">
-                <span class="modal-review-stars">
-                  @for (star of [1,2,3,4,5]; track star) {
-                    <span [class.filled]="star <= rev.rating">★</span>
-                  }
-                </span>
-              </div>
-              @if (rev.description) {
-                <p class="modal-review-text">{{ rev.description }}</p>
-              }
-            </div>
-          }
-        </div>
-      }
-
-    </div>
-  </div>
-}

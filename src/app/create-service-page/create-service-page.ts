@@ -12,15 +12,12 @@ import { Auth } from '../auth';
 })
 export class CreateServicePage implements OnInit {
 
-  // Campi del form
-  categoryName  = '';   // nome libero della categoria
-  description   = '';   // descrizione/presentazione del servizio
-  tagsInput     = '';   // tag separati da virgola
+  selectedTypeId: number | null = null;  // categoria selezionata dalla lista
+  description   = '';
+  tagsInput     = '';
   price: number = 0;
 
-  // Suggerimenti categorie esistenti (per l'autocomplete)
   existingTypes = signal<any[]>([]);
-  showSuggestions = false;
 
   loading = signal(false);
   success = signal(false);
@@ -36,33 +33,30 @@ export class CreateServicePage implements OnInit {
   ) {}
 
   ngOnInit() {
-  if (!this.auth.isLoggedIn()) {
-    this.router.navigate(['/login']);
-    return;
-  }
-  this.http.get<any[]>(this.opTypesUrl, { withCredentials: true })
-    .subscribe({ next: types => this.existingTypes.set(types) });
-}
-
-  // Suggerimenti filtrati mentre si digita
-  get suggestions(): any[] {
-    const q = this.categoryName.toLowerCase().trim();
-    if (!q) return [];
-    return this.existingTypes().filter(t =>
-      t.name.toLowerCase().includes(q)
-    ).slice(0, 5);
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.http.get<any[]>(this.opTypesUrl, { withCredentials: true })
+      .subscribe({ next: types => this.existingTypes.set(types) });
   }
 
-  selectSuggestion(type: any) {
-    this.categoryName  = type.name;
-    this.description   = type.description ?? '';
-    this.tagsInput     = (type.tags ?? []).join(', ');
-    this.showSuggestions = false;
+  // quando si seleziona una categoria precompila descrizione e tag
+  onTypeSelected() {
+    const type = this.existingTypes().find(t => t.id === Number(this.selectedTypeId));
+    if (type) {
+      this.description = type.description ?? '';
+      this.tagsInput   = (type.tags ?? []).join(', ');
+    }
+  }
+
+  get selectedType(): any {
+    return this.existingTypes().find(t => t.id === Number(this.selectedTypeId));
   }
 
   create() {
-    if (!this.categoryName.trim()) {
-      this.error.set('Inserisci il nome del servizio.');
+    if (!this.selectedTypeId) {
+      this.error.set('Seleziona una categoria di servizio.');
       return;
     }
     if (!this.description.trim()) {
@@ -77,58 +71,19 @@ export class CreateServicePage implements OnInit {
     this.loading.set(true);
     this.error.set('');
 
-    const userId = this.auth.currentUser()?.id;
-    if (!userId) {
-      this.error.set('Utente non autenticato.');
-      this.loading.set(false);
-      return;
-    }
-
-    // Controlla se esiste già una categoria con lo stesso nome (case-insensitive)
-    const existing = this.existingTypes().find(
-      t => t.name.toLowerCase() === this.categoryName.trim().toLowerCase()
-    );
-
-    if (existing) {
-      // Categoria già esistente → usa direttamente il suo id
-      this.createVendorOperation(existing.id);
-    } else {
-      // Categoria nuova → prima la crea, poi crea il servizio
-      const tags = this.tagsInput
-        .split(',')
-        .map(t => t.trim())
-        .filter(t => t.length > 0);
-
-      const typeBody = {
-        userId,
-        name:        this.categoryName.trim(),
-        description: this.description.trim(),
-        tags:        tags.length > 0 ? tags : [this.categoryName.trim()],
-      };
-
-      this.http.post<any>(this.opTypesUrl, typeBody, { withCredentials: true })
-        .subscribe({
-          next:  (created) => this.createVendorOperation(created.id),
-          error: () => {
-            this.loading.set(false);
-            this.error.set('Errore durante la creazione della categoria. Riprova.');
-          }
-        });
-    }
-  }
-
-  private createVendorOperation(operationTypeId: number) {
-    this.http.post(this.vendorUrl, { operationTypeId, price: this.price }, { withCredentials: true })
-      .subscribe({
-        next: () => {
-          this.loading.set(false);
-          this.success.set(true);
-          setTimeout(() => this.router.navigate(['/servizi']), 2000);
-        },
-        error: () => {
-          this.loading.set(false);
-          this.error.set('Errore durante la pubblicazione del servizio. Riprova.');
-        }
-      });
+    this.http.post(this.vendorUrl,
+      { operationTypeId: Number(this.selectedTypeId), price: this.price },
+      { withCredentials: true }
+    ).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.success.set(true);
+        setTimeout(() => this.router.navigate(['/servizi']), 2000);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set('Errore durante la pubblicazione del servizio. Riprova.');
+      }
+    });
   }
 }

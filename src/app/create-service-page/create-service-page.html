@@ -10,8 +10,7 @@
 
     <h1 class="create-title">Offri un servizio</h1>
     <p class="create-sub">
-      Descrivi il servizio che vuoi offrire. Se la categoria esiste già
-      ti verrà suggerita automaticamente, altrimenti ne creerai una nuova.
+      Seleziona la categoria di servizio che vuoi offrire e inserisci il tuo prezzo.
     </p>
 
     @if (success()) {
@@ -20,29 +19,18 @@
       </div>
     } @else {
 
-      <!-- NOME CATEGORIA (testo libero + autocomplete) -->
+      <!-- SELEZIONE CATEGORIA -->
       <div class="form-group">
-        <label class="form-label">Nome del servizio *</label>
-        <div class="autocomplete-wrapper">
-          <input class="form-input"
-            type="text"
-            placeholder="es. Idraulico, Elettricista, Giardiniere..."
-            [(ngModel)]="categoryName"
-            (ngModelChange)="showSuggestions = true; error.set('')"
-            (blur)="showSuggestions = false"
-            autocomplete="off" />
-          @if (showSuggestions && suggestions.length > 0) {
-            <div class="suggestions-list">
-              @for (s of suggestions; track s.id) {
-                <div class="suggestion-item" (mousedown)="selectSuggestion(s)">
-                  <span class="suggestion-name">{{ s.name }}</span>
-                  <span class="suggestion-hint">categoria esistente</span>
-                </div>
-              }
-            </div>
+        <label class="form-label">Categoria servizio *</label>
+        <select class="form-input form-select"
+          [(ngModel)]="selectedTypeId"
+          (ngModelChange)="onTypeSelected(); error.set('')">
+          <option [ngValue]="null" disabled>— Seleziona una categoria —</option>
+          @for (type of existingTypes(); track type.id) {
+            <option [ngValue]="type.id">{{ type.name }}</option>
           }
-        </div>
-        <span class="form-hint">Scrivi liberamente — se la categoria esiste già verrà riutilizzata</span>
+        </select>
+        <span class="form-hint">Scegli tra le categorie disponibili sulla piattaforma</span>
       </div>
 
       <!-- DESCRIZIONE / PRESENTAZIONE -->
@@ -57,31 +45,12 @@
         <span class="form-hint">{{ description.length }}/500 caratteri</span>
       </div>
 
-      <!-- TAG (opzionale) -->
-      <div class="form-group">
-        <label class="form-label">Tag descrittivi</label>
-        <input class="form-input"
-          type="text"
-          placeholder="es. urgenze, notturno, senza chiamata fissa..."
-          [(ngModel)]="tagsInput" />
-        <span class="form-hint">Separati da virgola — aiutano i clienti a trovarti</span>
-      </div>
-
-      <!-- ANTEPRIMA (se nome e descrizione compilati) -->
-      @if (categoryName.trim() && description.trim()) {
+      <!-- ANTEPRIMA -->
+      @if (selectedType && description.trim()) {
         <div class="preview-box">
           <div class="preview-label">Anteprima scheda</div>
-          <div class="preview-name">{{ categoryName }}</div>
+          <div class="preview-name">{{ selectedType.name }}</div>
           <div class="preview-desc">{{ description }}</div>
-          @if (tagsInput.trim()) {
-            <div class="preview-tags">
-              @for (tag of tagsInput.split(','); track tag) {
-                @if (tag.trim()) {
-                  <span class="preview-tag">{{ tag.trim() }}</span>
-                }
-              }
-            </div>
-          }
         </div>
       }
 

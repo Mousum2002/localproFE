@@ -1,0 +1,150 @@
+<div class="vendor-wrapper">
+
+  <!-- LOADING / ERROR -->
+  @if (loading()) {
+    <div class="loading-state">Caricamento profilo...</div>
+  } @else if (error()) {
+    <div class="error-state">{{ error() }}</div>
+  } @else if (vendor()) {
+
+    <button class="btn-back" (click)="router.navigate(['/servizi'])">← Torna ai servizi</button>
+
+    <!-- HEADER PROFILO -->
+    <div class="vendor-header">
+      <div class="vendor-avatar">
+        @if (vendor().profileImage) {
+          <img [src]="vendor().profileImage" alt="avatar" />
+        } @else {
+          <span class="vendor-initials">{{ initials }}</span>
+        }
+      </div>
+      <div class="vendor-identity">
+        <h1 class="vendor-name">{{ vendor().firstName }} {{ vendor().lastName }}</h1>
+        <div class="vendor-username">@{{ vendor().userName }}</div>
+        @if (vendor().city) {
+          <div class="vendor-city">📍 {{ vendor().city }}</div>
+        }
+        @if (vendor().ratingAvg > 0) {
+          <div class="vendor-stars">
+            @for (star of starsArray; track star) {
+              <span [class.star-filled]="star <= vendor().ratingAvg">★</span>
+            }
+            <span class="rating-num">{{ vendor().ratingAvg }}/5</span>
+            <span class="review-count">({{ vendor().reviews?.length ?? 0 }} recensioni)</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- BIO -->
+    @if (vendor().bio) {
+      <p class="vendor-bio">{{ vendor().bio }}</p>
+    }
+
+    <!-- SERVIZI -->
+    <div class="section-card">
+      <h2 class="section-title">Servizi offerti</h2>
+
+      @if (!vendor().services || vendor().services.length === 0) {
+        <p class="empty-msg">Nessun servizio disponibile al momento.</p>
+      } @else {
+        <div class="services-grid">
+          @for (svc of vendor().services; track svc.id) {
+            <div class="service-card">
+              <div class="service-top">
+                <span class="service-category">{{ svc.category }}</span>
+                <span class="service-price">{{ svc.price }}€</span>
+              </div>
+              <p class="service-desc">{{ svc.description }}</p>
+
+              @if (!isOwnProfile) {
+                @if (auth.isLoggedIn()) {
+                  <button class="btn-book" (click)="bookService(svc.id)">Prenota</button>
+                } @else {
+                  <a routerLink="/login" class="btn-book-login">Accedi per prenotare</a>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- RECENSIONI -->
+    <div class="section-card">
+      <h2 class="section-title">
+        Recensioni
+        @if (vendor().reviews?.length > 0) {
+          <span class="review-badge">{{ vendor().reviews.length }}</span>
+        }
+      </h2>
+
+      @if (!vendor().reviews || vendor().reviews.length === 0) {
+        <p class="empty-msg">Ancora nessuna recensione.</p>
+      } @else {
+        <div class="reviews-list">
+          @for (r of vendor().reviews; track r.id) {
+            <div class="review-row">
+              <div class="review-header">
+                <span class="review-stars">
+                  @for (star of starsArray; track star) {
+                    <span [class.star-filled]="star <= r.rating">★</span>
+                  }
+                </span>
+                @if (r.userName) {
+                  <span class="review-author">{{ r.userName }}</span>
+                }
+                @if (canDelete(r)) {
+                  <button class="btn-del-review" (click)="deleteReview(r.id)" title="Elimina">🗑</button>
+                }
+              </div>
+              @if (r.description) {
+                <p class="review-text">{{ r.description }}</p>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- FORM NUOVA RECENSIONE -->
+      @if (auth.isLoggedIn() && !isOwnProfile) {
+        <div class="review-form">
+          <p class="review-form-title">Lascia una recensione</p>
+
+          <div class="star-selector">
+            @for (star of starsArray; track star) {
+              <span class="star-btn"
+                [class.star-active]="star <= (hoveredStar || newRating)"
+                (mouseenter)="hoveredStar = star"
+                (mouseleave)="hoveredStar = 0"
+                (click)="newRating = star">★</span>
+            }
+            @if (newRating > 0) {
+              <span class="star-label">{{ newRating }}/5</span>
+            }
+          </div>
+
+          <textarea class="review-textarea" rows="3"
+            placeholder="Scrivi la tua esperienza..."
+            [(ngModel)]="newDescription"
+            maxlength="500"></textarea>
+
+          @if (reviewError()) {
+            <p class="msg-error">{{ reviewError() }}</p>
+          }
+          @if (reviewSuccess()) {
+            <p class="msg-success">✅ Recensione inviata!</p>
+          }
+
+          <button class="btn-submit-review"
+            (click)="submitReview()"
+            [disabled]="reviewLoading()">
+            @if (reviewLoading()) { Invio... } @else { Invia recensione }
+          </button>
+        </div>
+      }
+    </div>
+
+  }
+
+</div>

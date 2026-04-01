@@ -7,6 +7,7 @@ import { ProfilePage } from './profile-page/profile-page';
 import { AdminPage } from './admin-page/admin-page';
 import { ServicePage } from './service-page/service-page';
 import { CreateServicePage } from './create-service-page/create-service-page';
+import { VendorPage } from './vendor-page/vendor-page';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
@@ -17,5 +18,6 @@ export const routes: Routes = [
   { path: 'admin', component: AdminPage },
   { path: 'servizi', component: ServicePage },
   { path: 'create-service', component: CreateServicePage },
+  { path: 'vendor/:id', component: VendorPage },   // ← NUOVO
   { path: '**', redirectTo: '' },
 ];
