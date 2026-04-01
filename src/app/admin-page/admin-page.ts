@@ -30,7 +30,12 @@ export class AdminPage implements OnInit {
     this.loading.set(true);
     this.adminService.getAllUsers().subscribe({
       next: (data) => {
-        this.users.set(data);
+        // normalizziamo banned → isBanned perché Jackson serializza boolean isBanned come banned
+        const normalized = data.map((u: any) => ({
+          ...u,
+          isBanned: u.isBanned ?? u.banned ?? false,
+        }));
+        this.users.set(normalized);
         this.loading.set(false);
       },
       error: () => {
@@ -100,14 +105,9 @@ export class AdminPage implements OnInit {
     }
   }
 
-  private updateLocalUser(updatedUser: any): void {
-    // il backend manda 'banned', l'entity usa 'isBanned' → normalizziamo
-    const normalized: PortalUser = {
-      ...updatedUser,
-      isBanned: updatedUser.isBanned ?? updatedUser.banned ?? false,
-    };
+  private updateLocalUser(updatedUser: PortalUser): void {
     this.users.update(list =>
-      list.map(u => (u.id === normalized.id ? normalized : u))
+      list.map(u => (u.id === updatedUser.id ? updatedUser : u))
     );
   }
 
