@@ -7,7 +7,7 @@ import { PortalUser } from '../model/entities';
 @Component({
   selector: 'app-admin-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],   // FIX: rimossi NgFor e NgIf (non servono con @for/@if)
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-page.html',
   styleUrls: ['./admin-page.css']
 })
@@ -26,11 +26,19 @@ export class AdminPage implements OnInit {
     this.loadUsers();
   }
 
+  // normalizza il campo banned/isBanned che Java serializza in modo diverso
+  private normalize(u: any): PortalUser {
+    return {
+      ...u,
+      isBanned: u.isBanned ?? u.banned ?? false,
+    } as PortalUser;
+  }
+
   loadUsers(): void {
     this.loading.set(true);
     this.adminService.getAllUsers().subscribe({
       next: (data) => {
-        this.users.set(data);
+        this.users.set(data.map(u => this.normalize(u)));
         this.loading.set(false);
       },
       error: () => {
@@ -40,7 +48,6 @@ export class AdminPage implements OnInit {
     });
   }
 
-  // FIX: era u.banned → corretto in u.isBanned
   activeUsers = computed(() => this.users().filter(u => !u.isBanned));
   bannedUsers = computed(() => this.users().filter(u => u.isBanned));
 
@@ -56,7 +63,6 @@ export class AdminPage implements OnInit {
 
   get filteredBanned(): PortalUser[] {
     const term = this.searchBanned.toLowerCase().trim();
-    // FIX: era u.banned → corretto in u.isBanned
     const banned = this.users().filter(u => u.isBanned);
     if (!term) return banned;
     return banned.filter(u =>
@@ -68,11 +74,10 @@ export class AdminPage implements OnInit {
 
   banUser(user: PortalUser): void {
     if (!user.userName) return;
-    // FIX: era u.banned → corretto in u.isBanned
     const azione = user.isBanned ? 'sbannare' : 'bannare';
     if (confirm(`Sei sicuro di voler ${azione} l'utente ${user.userName}?`)) {
       this.adminService.banUser(user.userName).subscribe({
-        next: (updatedUser: PortalUser) => {
+        next: (updatedUser: any) => {
           this.updateLocalUser(updatedUser);
         },
         error: () => {
@@ -101,11 +106,7 @@ export class AdminPage implements OnInit {
   }
 
   private updateLocalUser(updatedUser: any): void {
-    // il backend manda 'banned', l'entity usa 'isBanned' → normalizziamo
-    const normalized: PortalUser = {
-      ...updatedUser,
-      isBanned: updatedUser.isBanned ?? updatedUser.banned ?? false,
-    };
+    const normalized = this.normalize(updatedUser);
     this.users.update(list =>
       list.map(u => (u.id === normalized.id ? normalized : u))
     );

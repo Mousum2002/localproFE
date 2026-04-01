@@ -45,6 +45,7 @@ export class ServicePage implements OnInit {
     this.http.get<any[]>('http://localhost:8080/public/allOperationList')
       .subscribe(services => {
         this.allServices.set(services);
+        console.log('primo servizio:', services[0]);
         this.filteredServices.set(services);
         const cats = [...new Set(
           services.map((s: any) => s.category).filter((c: any) => !!c)

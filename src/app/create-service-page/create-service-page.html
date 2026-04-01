@@ -29,6 +29,7 @@
           @for (type of existingTypes(); track type.id) {
             <option [ngValue]="type.id">{{ type.name }}</option>
           }
+                <option [ngValue]="-1">Altro</option>
         </select>
         <span class="form-hint">Scegli tra le categorie disponibili sulla piattaforma</span>
       </div>

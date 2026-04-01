@@ -11,7 +11,6 @@ import { VendorPage } from './vendor-page/vendor-page';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
-  { path: 'professionisti', component: ProListPreview },
   { path: 'login', component: LoginPage },
   { path: 'register', component: RegisterPage },
   { path: 'profilo', component: ProfilePage },
