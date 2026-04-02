@@ -2,8 +2,16 @@
   display: block;
   min-height: 100vh;
   background: #0d1a14;
-  padding: 2rem 1rem;
+  padding: 2rem 1.5rem;
 }
+
+@media (min-width: 900px) {
+  :host {
+    padding: 2rem 2.5rem;
+  }
+}
+
+/* ══ LAYOUT CONTAINER ══════════════════════════════════════ */
 
 .profile-container {
   max-width: 680px;
@@ -11,6 +19,39 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+/* Mobile: col-left / col-right sono "trasparenti" —
+   i loro figli partecipano direttamente al flex della lista */
+.col-left,
+.col-right {
+  display: contents;
+}
+
+/* Desktop: griglia a 2 colonne */
+@media (min-width: 900px) {
+  .profile-container {
+    max-width: 1400px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .col-left {
+    grid-column: 1;
+  }
+
+  .col-right {
+    grid-column: 2 / 4; /* occupa le colonne 2 e 3 */
+  }
+
+  .col-left,
+  .col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 }
 
 /* ── HEADER ── */
@@ -170,6 +211,81 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+/* ══ BOOKINGS ROW — fianco a fianco su desktop ════════════ */
+
+.bookings-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .bookings-row {
+    flex-direction: row;
+    align-items: start;
+  }
+
+  .bookings-row .form-card {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* ══ COLLAPSIBLE CARD ══════════════════════════════════════ */
+
+.collapsible-card {
+  /* <details> eredita form-card; azziamo il marker nativo */
+}
+
+/* Leggermente più bassa quando chiusa */
+.collapsible-card:not([open]) {
+  padding-top: 1.2rem;
+  padding-bottom: 1.2rem;
+}
+
+.collapsible-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  user-select: none;
+  /* annulla il padding-bottom della card quando chiusa */
+  margin-bottom: 0;
+}
+
+/* Rimuovi il triangolino del browser */
+.collapsible-summary::-webkit-details-marker,
+.collapsible-summary::marker { display: none; }
+
+.collapse-chevron {
+  font-size: 1.1rem;
+  line-height: 1;
+  color: rgba(255,255,255,0.35);
+  transition: transform 0.25s ease, color 0.2s;
+  flex-shrink: 0;
+}
+
+.collapsible-card[open] .collapse-chevron {
+  transform: rotate(180deg);
+  color: #25a865;
+}
+
+/* Animazione apertura */
+.collapsible-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  overflow: hidden;
+  animation: slideDown 0.22s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── FORM ── */
@@ -599,7 +715,7 @@
   font-size: 1rem;
 }
 
-.rating-star { font-size: 0.9rem;  color: #f0c040 !important; }
+.rating-star { font-size: 0.9rem; color: #f0c040 !important; }
 
 /* ── RECENSIONI ── */
 .review-item {
