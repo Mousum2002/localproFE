@@ -119,6 +119,28 @@
   transform: translateY(-2px); /* Effetto sollevamento */
 }
 
+
+.btn-ghost2 {
+  cursor: pointer; /* Indispensabile per i tag <button> */
+  background: transparent;
+  color: var(--white); /* Testo ora bianco pieno */
+  text-decoration: none;
+  padding: 0.85rem 1.5rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  font-weight: 600; /* Un po' più di spessore al testo */
+  transition: all 0.3s ease; /* Transizione più fluida */
+  display: inline-block;
+}
+
+.btn-ghost2:hover {
+  border-color: var(--green-light); /* Cambia colore al passaggio */
+  background: rgba(37, 168, 101, 0.1); /* Leggero riflesso verde */
+  color: var(--white);
+  transform: translateY(-2px); /* Effetto sollevamento */
+}
+
+
 .hero-stats {
   display: flex;
   align-items: center;
@@ -179,6 +201,12 @@
 .card-2 { top: 48%;  left: 25%; animation-delay: 1.3s; }
 .card-3 { top: 72%;  left: 8%;  animation-delay: 0.7s; }
 .card-4 { top: 96%;  left: 25%;  animation-delay: 2s; background-color: #2fa564;}
+
+.card-4:hover {
+  background: var(--green);
+  transform: translateY(-1px);
+  color: var(--white);
+}
 
 .card-icon { font-size: 1.4rem; }
 
