@@ -33,8 +33,8 @@ export class CreateServicePage implements OnInit {
   success = signal(false);
   error   = signal('');
 
-  private opTypesUrl = 'http://localhost:8080/public/operation-types';
-  private vendorUrl  = 'http://localhost:8080/api/vendor-operations';
+  private opTypesUrl = 'http://localhost:8089/public/operation-types';
+  private vendorUrl  = 'http://localhost:8089/api/vendor-operations';
 
   constructor(
     private http: HttpClient,

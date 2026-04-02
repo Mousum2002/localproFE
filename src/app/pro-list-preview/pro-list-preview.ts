@@ -27,12 +27,14 @@ export class ProListPreview implements OnInit {
 
   ngOnInit() {
     this.loadUsers();
-    this.http.get<OperationType[]>('http://localhost:8080/api/operation-types')
+    this.http.get<OperationType[]>('http://localhost:8089/api/operation-types')
       .subscribe(types => this.operationTypes.set(types));
   }
 
+
+  //inutile
       loadUsers() {
-  this.http.get<any[]>('http://localhost:8080/public')
+  this.http.get<any[]>('http://localhost:8089/public')
     .subscribe(users => {
       const currentRoles = this.auth.currentUser()?.roles ?? [];
       const isAdmin = currentRoles.includes('ADMIN') || currentRoles.includes('ROLE_ADMIN');
@@ -74,18 +76,18 @@ export class ProListPreview implements OnInit {
   }
 
   banUser(id: number) {
-    this.http.put(`http://localhost:8080/admin/ban/${id}`, {}, { withCredentials: true })
+    this.http.put(`http://localhost:8089/admin/ban/${id}`, {}, { withCredentials: true })
       .subscribe(() => this.loadUsers());
   }
 
   unbanUser(id: number) {
-    this.http.put(`http://localhost:8080/admin/unban/${id}`, {}, { withCredentials: true })
+    this.http.put(`http://localhost:8089/admin/unban/${id}`, {}, { withCredentials: true })
       .subscribe(() => this.loadUsers());
   }
 
   deleteUser(id: number) {
     if (!confirm('Sei sicuro di voler eliminare questo utente?')) return;
-    this.http.delete(`http://localhost:8080/api/users/${id}`, { withCredentials: true })
+    this.http.delete(`http://localhost:8089/api/users/${id}`, { withCredentials: true })
       .subscribe(() => this.loadUsers());
   }
 

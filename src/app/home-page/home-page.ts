@@ -18,7 +18,7 @@ export class HomePage implements OnInit {
 
   ngOnInit() {
 
-    this.http.get<any[]>('http://localhost:8080/public/allOperationList')
+    this.http.get<any[]>('http://localhost:8089/public/allOperationList')
     .subscribe(operations => {
       // Imposta il totale basandoti sulla lunghezza dell'array ricevuto
       this.totalServices.set(operations.length);

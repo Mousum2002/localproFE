@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { first } from 'rxjs';
+
 
 @Component({
   selector: 'app-register-page',
@@ -59,7 +59,7 @@ export class RegisterPage {
       y: 0,
     };
 
-    this.http.post('http://localhost:8080/public/register', body).subscribe({
+    this.http.post('http://localhost:8089/public/register', body).subscribe({
       next: () => {
         this.loading.set(false);
         this.success.set(true);

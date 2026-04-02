@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class AdminService {
   private http = inject(HttpClient);
-  private adminUrl = 'http://localhost:8080/admin';
+  private adminUrl = 'http://localhost:8089/admin';
 
   /**
    * Recupera tutti gli utenti per la dashboard
@@ -39,6 +39,6 @@ export class AdminService {
 
   public deleteUser(userId: number): Observable<void> {
     // Nota: aggiungiamo withCredentials se il backend è protetto
-    return this.http.delete<void>(`http://localhost:8080/admin/delete/${userId}`, { withCredentials: true });
+    return this.http.delete<void>(`http://localhost:8089/admin/delete/${userId}`, { withCredentials: true });
   }
 }

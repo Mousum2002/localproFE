@@ -44,11 +44,11 @@ export class ProfilePage implements OnInit {
   success = signal(false);
   error   = signal('');
 
-  private apiUrl      = 'http://localhost:8080/api/users';
-  private bookingsUrl = 'http://localhost:8080/api/prenotazioni';
-  private vendorUrl   = 'http://localhost:8080/api/vendor-operations';
-  private opTypesUrl  = 'http://localhost:8080/public/operation-types';
-  private reviewsUrl  = 'http://localhost:8080/public/reviews';
+  private apiUrl      = 'http://localhost:8089/api/users';
+  private bookingsUrl = 'http://localhost:8089/api/prenotazioni';
+  private vendorUrl   = 'http://localhost:8089/api/vendor-operations';
+  private opTypesUrl  = 'http://localhost:8089/public/operation-types';
+  private reviewsUrl  = 'http://localhost:8089/public/reviews';
 
   operationTypes      = signal<any[]>([]);
   editOperationTypeId = 0;

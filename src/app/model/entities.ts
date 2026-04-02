@@ -46,3 +46,19 @@ export interface OperationTypeByVendor {
     operationType: OperationType;
     price: number;
 }
+
+export interface user{
+    id?: number;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    address?: string;
+    city?: string;
+    bio?: string;
+    x: number;
+    y: number;
+    roles?: string[];
+}
+

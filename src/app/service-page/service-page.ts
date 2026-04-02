@@ -51,7 +51,7 @@ export class ServicePage implements OnInit {
   ngOnInit() { this.loadServices(); }
 
   loadServices() {
-    this.http.get<any[]>('http://localhost:8080/public/allOperationList')
+    this.http.get<any[]>('http://localhost:8089/public/allOperationList')
       .subscribe(services => {
         this.allServices.set(services);
         this.filteredServices.set(services);
@@ -65,7 +65,7 @@ export class ServicePage implements OnInit {
           if (!mapEl || this.map) return;
           this.map = L.map(mapEl).setView([41.9028, 12.4964], 6);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+            attribution: '© Non Rispettiamo il tuo privacy:)'
           }).addTo(this.map);
           this.markersGroup.addTo(this.map);
           this.updateMapMarkers(services);
@@ -121,7 +121,7 @@ export class ServicePage implements OnInit {
     this.bookingError.set('');
 
     this.http.post(
-      'http://localhost:8080/api/prenotazioni',
+      'http://localhost:8089/api/prenotazioni',
       {
         serviceId: svc.id,
         note: this.bookingNote,
