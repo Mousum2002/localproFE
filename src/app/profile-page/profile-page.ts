@@ -10,6 +10,8 @@ import { ReviewService } from '../Services/review.service';
 import { LocationService } from '../Services/localtion-service';
 import { of, switchMap, catchError } from 'rxjs';
 import { SnackbarService } from '../Services/snackbar.service';
+import { PortalUserRequest } from '../model/User';
+import { LoggedUser } from '../Services/auth.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -354,7 +356,7 @@ export class ProfilePage implements OnInit {
           const y = coords?.y ?? fallbackCoords.y;
           const finalCity = cityInput || coords?.city || user.city || '';
 
-          const body: any = {
+          const body: PortalUserRequest = {
             userName: user.userName,
             email: user.email,
             password: 'UNCHANGED',
@@ -368,11 +370,13 @@ export class ProfilePage implements OnInit {
             profileImage: this.previewUrl || this.profileImageUrl,
           };
 
-          return this.http.put<any>(`${this.usersUrl}/${user.id}`, body, { withCredentials: true });
+          return this.http.put<LoggedUser>(`${this.usersUrl}`, body, {
+            withCredentials: true,
+          });
         })
       )
       .subscribe({
-        next: (updated: any) => {
+        next: (updated: LoggedUser) => {
           this.loading.set(false);
           this.success.set(true);
 

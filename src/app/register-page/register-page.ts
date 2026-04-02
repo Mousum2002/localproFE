@@ -87,24 +87,32 @@ export class RegisterPage {
           ? coordsMaybe
           : { x: 41.9028, y: 12.4964, city: undefined, source: 'ip' }; // Roma (fallback sicuro)
 
+        // Allinea a `POST /api/users` + `PortalUserDTO` (backend locale: niente `/public/register`).
         const body = {
-          userName: this.userName,
+          firstName: this.firstName ?? '',
+          lastName: this.lastName ?? '',
           email: this.email,
           password: this.password,
           city: cityInput || coords?.city || '',
           address: addressInput,
-          firstName: this.firstName,
-          lastName: this.lastName,
-          x: coords.x,
-          y: coords.y,
+          bio: '',
+          role: 'USER',
+          x: Math.round(coords.x),
+          y: Math.round(coords.y),
         };
 
-        this.http.post<LoggedUser>(`${environment.apiUrl}/public/register`, body).subscribe({
-          next: (user) => {
+        this.http.post<LoggedUser>(`${environment.apiUrl}/api/users`, body).subscribe({
+          next: (raw) => {
             this.loading.set(false);
             this.success.set(true);
 
-            // Usa la response del backend per considerare l'utente loggato
+            const user: LoggedUser = {
+              ...raw,
+              userName: (raw as any).userName ?? this.userName,
+              roles: (raw as any).roles ?? ['USER'],
+              profileImage: (raw as any).profileImage ?? '',
+            };
+
             this.auth.setSession(user);
             this.snackbar.show('Registrazione completata con successo!', 'success');
 

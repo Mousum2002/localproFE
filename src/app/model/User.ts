@@ -21,6 +21,21 @@ export interface CreateUserRequest extends UserBase {
   password: string;
 }
 
+/** Mirrors backend `PortalUserRequestDTO` (PUT user update). */
+export interface PortalUserRequest {
+  userName: string;
+  email: string;
+  password: string;
+  x: number;
+  y: number;
+  firstName?: string;
+  lastName?: string;
+  profileImage?: string;
+  city?: string;
+  address?: string;
+  bio?: string;
+}
+
 export interface UserResponse extends UserBase {
   readonly id: number;
   readonly roles: string[];
