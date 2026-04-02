@@ -6,7 +6,8 @@ import { Component, input, output } from '@angular/core';
   templateUrl: './pro-card.html',
   styleUrl: './pro-card.css',
 })
-export class ProCard {
+export class ProCard 
+{
   portalUser = input.required<any>();
   isAdmin    = input<boolean>(false);
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminService } from '../admin-service';
+import { AdminService } from '../Services/admin.service';
 import { PortalUser } from '../model/entities';
 
 @Component({
