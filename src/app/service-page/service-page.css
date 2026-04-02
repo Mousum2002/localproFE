@@ -87,17 +87,17 @@
 /* MAP VIEW TOGGLE */
 .map-toggle-row {
   display: flex;
-  justify-content: flex-start;
   margin-top: -1.25rem;
   margin-bottom: 0.75rem;
+  justify-content: flex-end;
 }
 
 .btn-map-toggle {
   background: transparent;
   border: 1px solid rgba(37,168,101,0.3);
-  color: rgba(255,255,255,0.6);
+  color: #ffffff;
   font-family: 'Courier New', monospace;
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   padding: 0.35rem 0.8rem;
   border-radius: 8px;
   cursor: pointer;

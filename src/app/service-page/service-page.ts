@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit,  OnDestroy, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../Services/auth.service';
@@ -15,7 +15,7 @@ import { SnackbarService } from '../Services/snackbar.service';
   templateUrl: './service-page.html',
   styleUrl: './service-page.css',
 })
-export class ServicePage implements OnInit {
+export class ServicePage implements OnInit, OnDestroy {
   allServices      = signal<OperationListItem[]>([]);
   filteredServices = signal<OperationListItem[]>([]);
   categories       = signal<string[]>([]);
@@ -137,6 +137,10 @@ export class ServicePage implements OnInit {
     setTimeout(() => {
       this.mapService.initMap('map', [41.9028, 12.4964], 6);
       this.mapService.updateMarkers(this.filteredServices());
-    }, 0);
+    }, 200);
   }
+
+   ngOnDestroy() {
+  this.mapService.destroy();
+}
 }
