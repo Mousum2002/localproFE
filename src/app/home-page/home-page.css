@@ -178,7 +178,7 @@
 .card-1 { top: 20%;  left: 5%;  animation-delay: 0s; }
 .card-2 { top: 48%;  left: 25%; animation-delay: 1.3s; }
 .card-3 { top: 72%;  left: 8%;  animation-delay: 0.7s; }
-.card-4 { top: 96%;  left: 25%;  animation-delay: 2s; }
+.card-4 { top: 96%;  left: 25%;  animation-delay: 2s; background-color: #2fa564;}
 
 .card-icon { font-size: 1.4rem; }
 
