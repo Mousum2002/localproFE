@@ -91,17 +91,18 @@ export class RegisterPage {
         const body = {
           firstName: this.firstName ?? '',
           lastName: this.lastName ?? '',
+          userName: this.userName,
           email: this.email,
           password: this.password,
           city: cityInput || coords?.city || '',
           address: addressInput,
           bio: '',
           role: 'USER',
-          x: Math.round(coords.x),
-          y: Math.round(coords.y),
+          x: coords.x,
+          y: coords.y,
         };
 
-        this.http.post<LoggedUser>(`${environment.apiUrl}/api/users`, body).subscribe({
+        this.http.post<LoggedUser>(`${environment.apiUrl}/public/register`, body).subscribe({
           next: (raw) => {
             this.loading.set(false);
             this.success.set(true);
