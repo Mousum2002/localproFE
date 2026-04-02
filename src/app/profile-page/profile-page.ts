@@ -42,8 +42,9 @@ export class ProfilePage implements OnInit {
     return (sum / revs.length).toFixed(1);
   });
 
-  bookingTab = signal<'tutti' | 'in-attesa' | 'confermato' | 'completato' | 'cancellata'>('tutti');
-  serviceTab = signal<'tutti' | 'in-attesa' | 'confermato' | 'completato' | 'cancellata'>('tutti');
+  bookingTab  = signal<'tutti' | 'in-attesa' | 'confermato' | 'completato' | 'cancellata'>('tutti');
+  incomingTab = signal<'tutti' | 'in-attesa' | 'confermato' | 'completato' | 'cancellata'>('tutti');
+  serviceTab  = signal<'tutti' | 'in-attesa' | 'confermato' | 'completato' | 'cancellata'>('tutti');
 
   editingService = signal<any | null>(null);
   editPrice      = 0;
@@ -195,6 +196,30 @@ export class ProfilePage implements OnInit {
 
   setServiceTab(tab: string) {
     this.serviceTab.set(tab as any);
+  }
+
+  setIncomingTab(tab: string) {
+    this.incomingTab.set(tab as any);
+  }
+
+  filteredIncoming = computed(() => {
+    const tab = this.incomingTab();
+    const all = this.incomingBookings();
+    if (tab === 'tutti') return all;
+    const map: Record<string, string> = {
+      'in-attesa': 'Creato', 'confermato': 'Confermato',
+      'completato': 'Completato', 'cancellata': 'Cancellata',
+    };
+    return all.filter(b => b.status === map[tab]);
+  });
+
+  incomingTabCount(tab: string): number {
+    if (tab === 'tutti') return this.incomingBookings().length;
+    const map: Record<string, string> = {
+      'in-attesa': 'Creato', 'confermato': 'Confermato',
+      'completato': 'Completato', 'cancellata': 'Cancellata',
+    };
+    return this.incomingBookings().filter(b => b.status === map[tab]).length;
   }
 
   // ── SERVIZI OFFERTI ───────────────────────────────────────

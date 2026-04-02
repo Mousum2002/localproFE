@@ -143,14 +143,32 @@
     <h2 class="form-title">Prenotazioni in arrivo</h2>
     <p class="section-sub">Richieste ricevute per i tuoi servizi</p>
 
-    @if (incomingBookings().length === 0) {
+    <div class="tab-bar">
+      @for (tab of [
+        {key:'tutti', label:'Tutti'},
+        {key:'in-attesa', label:'In attesa'},
+        {key:'confermato', label:'Confermati'},
+        {key:'completato', label:'Completati'},
+        {key:'cancellata', label:'Annullati'}
+      ]; track tab.key) {
+        <button class="tab-btn" [class.active]="incomingTab() === tab.key"
+          (click)="setIncomingTab(tab.key)">
+          {{ tab.label }}
+          @if (incomingTabCount(tab.key) > 0) {
+            <span class="tab-count">{{ incomingTabCount(tab.key) }}</span>
+          }
+        </button>
+      }
+    </div>
+
+    @if (filteredIncoming().length === 0) {
       <div class="empty-section">
         <span>📩</span>
-        <p>Nessuna prenotazione ricevuta.</p>
+        <p>Nessuna prenotazione in questa categoria.</p>
       </div>
     } @else {
       <div class="items-list">
-        @for (b of incomingBookings(); track b.id) {
+        @for (b of filteredIncoming(); track b.id) {
           <div class="item-row" [class.item-cancelled]="b.status === 'Cancellata'">
             <div class="item-info">
               <div class="item-name">{{ b.serviceOperationName }}</div>
