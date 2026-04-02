@@ -138,6 +138,71 @@
     }
   </div>
 
+  <!-- ── PRENOTAZIONI IN ARRIVO ───────────────────────────── -->
+  <div class="form-card">
+    <h2 class="form-title">Prenotazioni in arrivo</h2>
+    <p class="section-sub">Richieste ricevute per i tuoi servizi</p>
+
+    @if (incomingBookings().length === 0) {
+      <div class="empty-section">
+        <span>📩</span>
+        <p>Nessuna prenotazione ricevuta.</p>
+      </div>
+    } @else {
+      <div class="items-list">
+        @for (b of incomingBookings(); track b.id) {
+          <div class="item-row" [class.item-cancelled]="b.status === 'Cancellata'">
+            <div class="item-info">
+              <div class="item-name">{{ b.serviceOperationName }}</div>
+              @if (b.serviceDescription) {
+                <div class="item-description">{{ b.serviceDescription }}</div>
+              }
+              <div class="item-meta">
+                <span class="meta-chip">👤 {{ b.userName }}</span>
+                <span class="meta-chip price-chip">💶 {{ b.servicePrice }}€</span>
+                @if (b.reservationDate) {
+                  <span class="meta-chip date-chip">
+                    📅 {{ b.reservationDate | date:'dd/MM/yyyy' }} alle {{ b.reservationDate | date:'HH:mm' }}
+                  </span>
+                }
+              </div>
+              @if (b.note) {
+                <div class="item-note">📝 {{ b.note }}</div>
+              }
+            </div>
+            <div class="item-actions">
+              <span class="status-badge" [class]="bookingStatusClass(b.status)">
+                {{ bookingStatusLabel(b.status) }}
+              </span>
+
+              @if (b.status === 'Creato') {
+                <button
+                  class="btn-accept"
+                  (click)="acceptIncoming(b)"
+                  [disabled]="incomingActionLoadingId() === b.id">
+                  @if (incomingActionLoadingId() === b.id) { In corso... } @else { Accetta }
+                </button>
+                <button
+                  class="btn-cancel"
+                  (click)="rejectIncoming(b)"
+                  [disabled]="incomingActionLoadingId() === b.id">
+                  @if (incomingActionLoadingId() === b.id) { In corso... } @else { Rifiuta }
+                </button>
+              } @else if (b.status === 'Confermato') {
+                <button
+                  class="btn-complete"
+                  (click)="completeIncoming(b)"
+                  [disabled]="incomingActionLoadingId() === b.id">
+                  @if (incomingActionLoadingId() === b.id) { In corso... } @else { Completa }
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
   <!-- ── I MIEI SERVIZI ────────────────────────────────────── -->
   <div class="form-card">
     <div class="section-header-row">

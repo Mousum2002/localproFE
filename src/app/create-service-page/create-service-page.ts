@@ -2,7 +2,9 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
-import { Auth } from '../auth';
+import { OperationService } from '../Services/operations.service';
+import { environment } from '../../environments/environment';
+import { AuthService } from '../Services/auth.service';
 
 interface OperationType {
   id: number;
@@ -33,13 +35,14 @@ export class CreateServicePage implements OnInit {
   success = signal(false);
   error   = signal('');
 
-  private opTypesUrl = 'http://localhost:8089/public/operation-types';
-  private vendorUrl  = 'http://localhost:8089/api/vendor-operations';
+  private opTypesUrl = `${environment.apiUrl}/public/operation-types`;
+  private vendorUrl  = `${environment.apiUrl}/api/vendor-operations`;
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    public auth: Auth
+    public auth: AuthService,
+    private operations: OperationService
   ) {}
 
   ngOnInit() {
@@ -119,10 +122,7 @@ export class CreateServicePage implements OnInit {
   }
 
   private createVendorOperation(operationTypeId: number) {
-    this.http.post(this.vendorUrl,
-      { operationTypeId, price: this.price },
-      { withCredentials: true }
-    ).subscribe({
+    this.operations.createOperation({ operationTypeId, price: this.price }).subscribe({
       next: () => {
         this.loading.set(false);
         this.success.set(true);

@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Auth } from '../auth';
+import { AuthService } from '../Services/auth.service';
 
 @Component({
   selector: 'app-login-page',
@@ -17,7 +17,7 @@ export class LoginPage {
   error = signal<string>('');
   loading = signal<boolean>(false);
 
-  constructor(private auth: Auth, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
   login() {
     if (!this.userName || !this.password) {

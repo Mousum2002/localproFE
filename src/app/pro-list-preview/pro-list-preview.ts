@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { OperationType } from '../model/entities';
 import { UserService } from '../user-service';
-import { Auth } from '../auth';
+import { AuthService } from '../Services/auth.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-pro-list-preview',
@@ -22,19 +23,19 @@ export class ProListPreview implements OnInit {
   constructor(
     private http: HttpClient,
     private userService: UserService,
-    public auth: Auth
+    public auth: AuthService
   ) {}
 
   ngOnInit() {
     this.loadUsers();
-    this.http.get<OperationType[]>('http://localhost:8089/api/operation-types')
+    this.http.get<OperationType[]>(`${environment.apiUrl}/api/operation-types`)
       .subscribe(types => this.operationTypes.set(types));
   }
 
 
   //inutile
       loadUsers() {
-  this.http.get<any[]>('http://localhost:8089/public')
+  this.http.get<any[]>(`${environment.apiUrl}/public`)
     .subscribe(users => {
       const currentRoles = this.auth.currentUser()?.roles ?? [];
       const isAdmin = currentRoles.includes('ADMIN') || currentRoles.includes('ROLE_ADMIN');
@@ -76,18 +77,18 @@ export class ProListPreview implements OnInit {
   }
 
   banUser(id: number) {
-    this.http.put(`http://localhost:8089/admin/ban/${id}`, {}, { withCredentials: true })
+    this.http.put(`${environment.apiUrl}/admin/ban/${id}`, {}, { withCredentials: true })
       .subscribe(() => this.loadUsers());
   }
 
   unbanUser(id: number) {
-    this.http.put(`http://localhost:8089/admin/unban/${id}`, {}, { withCredentials: true })
+    this.http.put(`${environment.apiUrl}/admin/unban/${id}`, {}, { withCredentials: true })
       .subscribe(() => this.loadUsers());
   }
 
   deleteUser(id: number) {
     if (!confirm('Sei sicuro di voler eliminare questo utente?')) return;
-    this.http.delete(`http://localhost:8089/api/users/${id}`, { withCredentials: true })
+    this.http.delete(`${environment.apiUrl}/api/users/${id}`, { withCredentials: true })
       .subscribe(() => this.loadUsers());
   }
 

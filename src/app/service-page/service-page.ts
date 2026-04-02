@@ -1,17 +1,11 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
-import { Auth } from '../auth';
-import * as L from 'leaflet';
-
-const iconDefault = L.icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
-});
-L.Marker.prototype.options.icon = iconDefault;
+import { AuthService } from '../Services/auth.service';
+import { OperationService } from '../Services/operations.service';
+import { OperationListItem } from '../model/Operations';
+import { MapService } from '../Services/map-service';
+import { PrenotazioneService } from '../Services/pernotazione.service';
 
 @Component({
   selector: 'app-service-page',
@@ -21,17 +15,15 @@ L.Marker.prototype.options.icon = iconDefault;
   styleUrl: './service-page.css',
 })
 export class ServicePage implements OnInit {
-
-  allServices      = signal<any[]>([]);
-  filteredServices = signal<any[]>([]);
+  allServices      = signal<OperationListItem[]>([]);
+  filteredServices = signal<OperationListItem[]>([]);
   categories       = signal<string[]>([]);
+
+  showMapView = signal(false);
 
   selectedCategory = '';
   cityFilter       = '';
   searchText       = '';
-
-  map!: L.Map;
-  markersGroup = L.layerGroup();
 
   // --- MODAL PRENOTAZIONE ---
   bookingModal   = signal<any | null>(null);  // servizio selezionato
@@ -46,31 +38,27 @@ export class ServicePage implements OnInit {
     return new Date().toISOString().slice(0, 16);
   }
 
-  constructor(private http: HttpClient, public auth: Auth, private router: Router) {}
+  constructor(
+    private operations: OperationService,
+    public auth: AuthService,
+    private router: Router,
+    private mapService: MapService,
+    private prenotazioneService: PrenotazioneService
+  ) {}
 
-  ngOnInit() { this.loadServices(); }
-
-  loadServices() {
-    this.http.get<any[]>('http://localhost:8089/public/allOperationList')
-      .subscribe(services => {
+  ngOnInit() {
+    this.operations.fetchAllOperations().subscribe({
+      next: () => {
+        const services = this.operations.Operations();
         this.allServices.set(services);
         this.filteredServices.set(services);
-        const cats = [...new Set(
-          services.map((s: any) => s.category).filter((c: any) => !!c)
-        )] as string[];
+        const cats = [...new Set(services.map((s) => s.category).filter((c): c is string => !!c))];
         this.categories.set(cats);
-
-        setTimeout(() => {
-          const mapEl = document.getElementById('map');
-          if (!mapEl || this.map) return;
-          this.map = L.map(mapEl).setView([41.9028, 12.4964], 6);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© Non Rispettiamo il tuo privacy:)'
-          }).addTo(this.map);
-          this.markersGroup.addTo(this.map);
-          this.updateMapMarkers(services);
-        }, 500);
-      });
+      },
+      error: () => {
+        // Se fallisce, mostriamo semplicemente una lista vuota.
+      }
+    });
   }
 
   filter() {
@@ -85,7 +73,7 @@ export class ServicePage implements OnInit {
         s.description?.toLowerCase().includes(this.searchText.toLowerCase())
       );
     this.filteredServices.set(result);
-    this.updateMapMarkers(result);
+    this.mapService.updateMarkers(result);
   }
 
   get isLoggedIn(): boolean { return this.auth.isLoggedIn(); }
@@ -120,15 +108,11 @@ export class ServicePage implements OnInit {
     this.bookingLoading.set(true);
     this.bookingError.set('');
 
-    this.http.post(
-      'http://localhost:8089/api/prenotazioni',
-      {
-        serviceId: svc.id,
-        note: this.bookingNote,
-        reservationDate: new Date(this.bookingDate).toISOString().slice(0, 19)
-      },
-      { withCredentials: true }
-    ).subscribe({
+    this.prenotazioneService.createPrenotazione({
+      serviceId: svc.id,
+      note: this.bookingNote,
+      reservationDate: new Date(this.bookingDate).toISOString().slice(0, 19),
+    }).subscribe({
       next: () => {
         this.bookingLoading.set(false);
         this.bookingSuccess.set(true);
@@ -140,24 +124,15 @@ export class ServicePage implements OnInit {
     });
   }
 
-  updateMapMarkers(services: any[]) {
-    if (!this.map) return;
-    this.markersGroup.clearLayers();
-    services.forEach(s => {
-      const lat = parseFloat(s.x);
-      const lng = parseFloat(s.y);
-      if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-        const marker = L.marker([lat, lng])
-          .bindPopup(`<b>${s.userName}</b><br><span style="color:#25a865">${s.category ?? ''}</span><br>📍 ${s.city ?? ''}`);
-        marker.on('click', () => this.router.navigate(['/vendor', s.userId]));
-        marker.addTo(this.markersGroup);
-      }
-    });
-    const layers: L.Layer[] = [];
-    this.markersGroup.eachLayer(l => layers.push(l));
-    if (layers.length > 0) {
-      const group = L.featureGroup(layers);
-      this.map.fitBounds(group.getBounds().pad(0.2));
-    }
+  openMapView() {
+    if (this.showMapView()) return;
+
+    this.showMapView.set(true);
+
+    // aspettiamo che l'elemento map sia visibile
+    setTimeout(() => {
+      this.mapService.initMap('map', [41.9028, 12.4964], 6);
+      this.mapService.updateMarkers(this.filteredServices());
+    }, 0);
   }
 }

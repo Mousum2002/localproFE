@@ -2,7 +2,13 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
-import { Auth } from '../auth';
+import { AuthService } from '../Services/auth.service';
+import { environment } from '../../environments/environment';
+import { OperationService } from '../Services/operations.service';
+import { PrenotazioneService } from '../Services/pernotazione.service';
+import { ReviewService } from '../Services/review.service';
+import { LocationService } from '../Services/localtion-service';
+import { of, switchMap, catchError } from 'rxjs';
 
 @Component({
   selector: 'app-profile-page',
@@ -23,8 +29,10 @@ export class ProfilePage implements OnInit {
   previewUrl: string | null = null;
 
   myBookings = signal<any[]>([]);
+  incomingBookings = signal<any[]>([]);
+  incomingActionLoadingId = signal<number | null>(null);
   myServices = signal<any[]>([]);
-  reviews    = signal<any[]>([]); //AGGIUNTO
+  reviews    = computed(() => this.reviewService.reviews());
 
   averageRating = computed(() => {
     const revs = this.reviews();
@@ -44,16 +52,23 @@ export class ProfilePage implements OnInit {
   success = signal(false);
   error   = signal('');
 
-  private apiUrl      = 'http://localhost:8089/api/users';
-  private bookingsUrl = 'http://localhost:8089/api/prenotazioni';
-  private vendorUrl   = 'http://localhost:8089/api/vendor-operations';
-  private opTypesUrl  = 'http://localhost:8089/public/operation-types';
-  private reviewsUrl  = 'http://localhost:8089/public/reviews';
+  private apiBase      = environment.apiUrl;
+  private usersUrl    = `${this.apiBase}/api/users`;
+  private bookingsUrl = `${this.apiBase}/api/prenotazioni`;
+  private vendorUrl   = `${this.apiBase}/api/vendor-operations`;
+  private opTypesUrl  = `${this.apiBase}/public/operation-types`;
 
   operationTypes      = signal<any[]>([]);
   editOperationTypeId = 0;
 
-  constructor(public auth: Auth, private http: HttpClient) {}
+  constructor(
+    public auth: AuthService,
+    private http: HttpClient,
+    private prenotazioneService: PrenotazioneService,
+    private reviewService: ReviewService,
+    private operations: OperationService,
+    private locationService: LocationService
+  ) {}
 
   ngOnInit() {
     const user = this.auth.currentUser();
@@ -67,36 +82,71 @@ export class ProfilePage implements OnInit {
       this.loadReviews(user.userName);  //aggiunto
     }
     this.loadBookings();
+    this.loadIncomingBookings();
     this.loadMyServices();
     this.loadOperationTypes();
   }
 
   loadReviews(userName: string) {
-    this.http.get<any[]>(`${this.reviewsUrl}/vendor/${userName}`)
-      .subscribe({ 
-        next: r => {
-          console.table(r);
-          this.reviews.set(r);
-        },
-        error: () => console.error("Errore caricamento recensioni")
-      });
+    this.reviewService.loadVendorReviews(userName);
   }
 
   loadBookings() {
-    this.http.get<any[]>(`${this.bookingsUrl}/getOutoingPrenotazioni`, { withCredentials: true })
-      .subscribe({ next: b => this.myBookings.set(b), error: () => {} });
+    this.prenotazioneService.getUserPrenotazioni().subscribe({
+      next: (b) => this.myBookings.set(b as any),
+      error: () => {},
+    });
   }
 
   cancelBooking(id: number) {
     if (!confirm('Annullare questa prenotazione?')) return;
-    this.http.delete(`${this.bookingsUrl}/${id}`, { withCredentials: true })
-      .subscribe({
-        next: () => {
-          this.myBookings.update(list =>
-            list.map(b => b.id === id ? { ...b, status: 'Cancellata' } : b)
-          );
-        }
-      });
+    this.prenotazioneService.cancelPrenotazione(id).subscribe({
+      next: () => {
+        this.myBookings.update((list) =>
+          list.map((b) => (b.id === id ? { ...b, status: 'Cancellata' } : b)),
+        );
+      },
+    });
+  }
+
+  loadIncomingBookings() {
+    this.prenotazioneService.getVendorPrenotazioni().subscribe({
+      next: (b) => this.incomingBookings.set(b as any),
+      error: () => {},
+    });
+  }
+
+  private updateIncomingStatus(id: number, status: string) {
+    this.incomingActionLoadingId.set(id);
+    this.prenotazioneService.updatePrenotazioneStatus(id, status).subscribe({
+      next: () => {
+        this.incomingBookings.update((list) =>
+          list.map((b) => (b.id === id ? { ...b, status } : b)),
+        );
+      },
+      error: () => {
+        // Keep UI unchanged on error.
+      },
+      complete: () => this.incomingActionLoadingId.set(null),
+    });
+  }
+
+  acceptIncoming(b: any) {
+    if (!b?.id) return;
+    if (!confirm('Accettare questa prenotazione?')) return;
+    this.updateIncomingStatus(b.id, 'Confermato');
+  }
+
+  rejectIncoming(b: any) {
+    if (!b?.id) return;
+    if (!confirm('Rifiutare questa prenotazione?')) return;
+    this.updateIncomingStatus(b.id, 'Cancellata');
+  }
+
+  completeIncoming(b: any) {
+    if (!b?.id) return;
+    if (!confirm('Segnare questa prenotazione come completata?')) return;
+    this.updateIncomingStatus(b.id, 'Completato');
   }
 
   filteredBookings = computed(() => {
@@ -146,11 +196,35 @@ export class ProfilePage implements OnInit {
   // ── SERVIZI OFFERTI ───────────────────────────────────────
 
   loadMyServices() {
-    const userId = this.auth.currentUser()?.id;
+    const user = this.auth.currentUser();
+    if (!user) return;
+
+    // Preferiamo evitare un'altra chiamata backend usando la lista cache in `OperationService`.
+    const cached = this.operations.Operations();
+    if (cached.length > 0) {
+      const filtered = cached.filter((op: any) => op.userName === user.userName || op.userId === user.id);
+      const mapped = filtered.map((op: any) => ({
+        ...op,
+        // normalizziamo i campi che la UI si aspetta per modifica/eliminazione
+        operationTypeId: op.operationTypeId ?? op.operationType?.id,
+        operationTypeName: op.operationTypeName ?? op.category ?? op.operationType?.name,
+        operationTypeDescription: op.operationTypeDescription ?? op.description ?? op.operationType?.description,
+      }));
+
+      const hasValidTypeId = mapped.some((s: any) => s.operationTypeId !== undefined && s.operationTypeId !== null);
+      if (mapped.length > 0 && hasValidTypeId) {
+        this.myServices.set(mapped);
+        return;
+      }
+    }
+
+    // Fallback: se la lista cache non contiene i campi necessari (operationTypeId ecc) usiamo il backend.
+    const userId = user.id;
     if (!userId) return;
-    // FIX critico: aggiunto ?vendorId per filtrare solo i servizi dell'utente
-    this.http.get<any[]>(`${this.vendorUrl}?vendorId=${userId}`, { withCredentials: true })
-      .subscribe({ next: s => this.myServices.set(s), error: () => {} });
+    this.http.get<any[]>(`${this.vendorUrl}?vendorId=${userId}`, { withCredentials: true }).subscribe({
+      next: (s) => this.myServices.set(s),
+      error: () => {},
+    });
   }
 
   loadOperationTypes() {
@@ -162,8 +236,7 @@ export class ProfilePage implements OnInit {
 
   deleteService(id: number) {
     if (!confirm('Eliminare questo servizio?')) return;
-    this.http.delete(`${this.vendorUrl}/${id}`, { withCredentials: true })
-      .subscribe(() => this.loadMyServices());
+    this.operations.deleteOperation(id).subscribe(() => this.loadMyServices());
   }
 
   startEdit(service: any) {
@@ -180,10 +253,7 @@ export class ProfilePage implements OnInit {
     const svc = this.editingService();
     if (!svc) return;
     this.editSaving.set(true);
-    this.http.put(`${this.vendorUrl}/${svc.id}`,
-      { operationTypeId: this.editOperationTypeId, price: this.editPrice },
-      { withCredentials: true }
-    ).subscribe({
+    this.operations.updateOperation(svc.id, { operationTypeId: this.editOperationTypeId, price: this.editPrice }).subscribe({
       next: () => {
         this.editSaving.set(false);
         this.editingService.set(null);
@@ -220,50 +290,74 @@ export class ProfilePage implements OnInit {
     this.error.set('');
     this.success.set(false);
 
-    // FIX: Ora usiamo 'this.city' e 'this.address' (i valori legati agli input)
-    const body: any = {
-      userName: user.userName, 
-      email: user.email, 
-      password: 'UNCHANGED',
-      firstName: this.firstName, 
-      lastName: this.lastName, 
-      bio: this.bio,
-      city: this.city,       // <-- Prende il valore dall'input
-      address: this.address, // <-- Prende il valore dall'input
-      x: user.x ?? 0, 
-      y: user.y ?? 0,
-      profileImage: this.previewUrl || this.profileImageUrl,
-    };
+    const addressInput = (this.address ?? '').trim();
+    const cityInput = (this.city ?? '').trim();
+    const query = [addressInput, cityInput].filter(Boolean).join(', ');
 
-    this.http.put(`${this.apiUrl}/${user.id}`, body, { withCredentials: true })
+    const fallbackCoords = { x: user.x ?? 0, y: user.y ?? 0 };
+
+    // Signup/profile: proviamo prima a geocodificare l'indirizzo inserito,
+    // e se fallisce usiamo un fallback di geolocalizzazione (browser/ip).
+    // Regola: prima validiamo l'indirizzo scritto.
+    // Se non è valido, allora chiediamo permesso posizione (browser) e poi IP fallback (interno al service).
+    // Se l'utente non ha modificato/fornito indirizzo, non chiediamo permessi.
+    const coords$ = query
+      ? this.locationService.getLocationFromAddress(query).pipe(
+          switchMap((coords) => coords ? of(coords) : this.locationService.getLocationFromBrowser())
+        )
+      : of(null);
+
+    coords$
+      .pipe(
+        catchError(() => of(null)),
+        switchMap((coords) => {
+          const x = coords?.x ?? fallbackCoords.x;
+          const y = coords?.y ?? fallbackCoords.y;
+          const finalCity = cityInput || coords?.city || user.city || '';
+
+          const body: any = {
+            userName: user.userName,
+            email: user.email,
+            password: 'UNCHANGED',
+            firstName: this.firstName,
+            lastName: this.lastName,
+            bio: this.bio,
+            city: finalCity,
+            address: addressInput,
+            x,
+            y,
+            profileImage: this.previewUrl || this.profileImageUrl,
+          };
+
+          return this.http.put<any>(`${this.usersUrl}/${user.id}`, body, { withCredentials: true });
+        })
+      )
       .subscribe({
         next: (updated: any) => {
           this.loading.set(false);
           this.success.set(true);
 
-          // Aggiorniamo l'oggetto utente globale con tutti i nuovi campi
-          const newUser = { 
-            ...user, 
+          const newUser = {
+            ...user,
             firstName: updated.firstName,
             lastName: updated.lastName,
-            bio: updated.bio, 
-            city: updated.city,       // <-- Aggiornato
-            address: updated.address, // <-- Aggiornato
-            profileImage: updated.profileImage 
+            bio: updated.bio,
+            city: updated.city,
+            address: updated.address,
+            profileImage: updated.profileImage,
           };
 
-          // Sincronizziamo il segnale di Auth e la sessione
           this.auth.currentUser.set(newUser);
           sessionStorage.setItem('user', JSON.stringify(newUser));
-          
+
           this.previewUrl = null;
           this.profileImageUrl = updated.profileImage;
-          
+
           setTimeout(() => this.success.set(false), 3000);
         },
-        error: () => { 
-          this.loading.set(false); 
-          this.error.set('Salvataggio fallito. Riprova.'); 
+        error: () => {
+          this.loading.set(false);
+          this.error.set('Salvataggio fallito. Riprova.');
         },
       });
   }

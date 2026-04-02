@@ -4,6 +4,10 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { environment } from '../../environments/environment';
+import { LocationService } from '../Services/localtion-service';
+import { of, switchMap, catchError } from 'rxjs';
+import { AuthService, LoggedUser } from '../Services/auth.service';
 
 
 @Component({
@@ -28,7 +32,12 @@ export class RegisterPage {
   firstName: any;
   lastName: any;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private locationService: LocationService,
+    private auth: AuthService
+  ) {}
 
   register() {
     if (!this.userName || !this.email || !this.password) {
@@ -47,28 +56,49 @@ export class RegisterPage {
     this.loading.set(true);
     this.error.set('');
 
-    const body = {
-      userName: this.userName,
-      email: this.email,
-      password: this.password,
-      city: this.city,
-      address: this.address,
-      firstName: this.firstName,
-      lastName: this.lastName,
-      x: 0,
-      y: 0,
-    };
+    const addressInput = (this.address ?? '').trim();
+    const cityInput = (this.city ?? '').trim();
+    const query = [addressInput, cityInput].filter(Boolean).join(', ');
 
-    this.http.post('http://localhost:8089/public/register', body).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.success.set(true);
-        this.router.navigate(['/home']);
-      },
-      error: () => {
-        this.loading.set(false);
-        this.error.set('Registrazione fallita. Username o email già in uso.');
-      }
-    });
+    // Regola: prima validiamo l'indirizzo scritto.
+    // Se non è valido, allora chiediamo permesso posizione (browser) e poi IP fallback (interno al service).
+    const coords$ = query
+      ? this.locationService.getLocationFromAddress(query).pipe(
+          switchMap((coords) => coords ? of(coords) : this.locationService.getLocationFromBrowser())
+        )
+      // Se non ha inserito indirizzo/città, non forziamo la richiesta permessi: lasciamo 0,0.
+      : of(null);
+
+    coords$
+      .pipe(catchError(() => of(null)))
+      .subscribe((coords) => {
+        const body = {
+          userName: this.userName,
+          email: this.email,
+          password: this.password,
+          city: cityInput || coords?.city || '',
+          address: addressInput,
+          firstName: this.firstName,
+          lastName: this.lastName,
+          x: coords?.x ?? 0,
+          y: coords?.y ?? 0,
+        };
+
+        this.http.post<LoggedUser>(`${environment.apiUrl}/public/register`, body).subscribe({
+          next: (user) => {
+            this.loading.set(false);
+            this.success.set(true);
+
+            // Usa la response del backend per considerare l'utente loggato
+            this.auth.setSession(user);
+
+            this.router.navigate(['/']);
+          },
+          error: () => {
+            this.loading.set(false);
+            this.error.set('Registrazione fallita. Username o email già in uso.');
+          },
+        });
+      });
   }
 }

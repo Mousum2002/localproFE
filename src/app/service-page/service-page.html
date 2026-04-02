@@ -22,7 +22,17 @@
     <span class="filter-count">{{ filteredServices().length }} servizi trovati</span>
   </div>
 
-  <div #mapContainer id="map" style="height: 400px; width: 100%; margin-bottom: 24px; border-radius: 12px;"></div>
+  <div class="map-toggle-row">
+    <button class="btn-map-toggle" (click)="openMapView()">show mapview</button>
+  </div>
+
+  @if (showMapView()) {
+    <div
+      #mapContainer
+      id="map"
+      style="height: 400px; width: 100%; margin-bottom: 24px; border-radius: 12px;"
+    ></div>
+  }
 
   <div class="services-grid">
     @for (s of filteredServices(); track s.id) {

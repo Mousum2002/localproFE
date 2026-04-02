@@ -403,6 +403,34 @@
 }
 .btn-cancel:hover { background: rgba(229,115,115,0.1); }
 
+.btn-accept {
+  background: transparent;
+  border: 1px solid rgba(129,199,132,0.35);
+  color: #81c784;
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.btn-accept:hover { background: rgba(129,199,132,0.1); border-color: rgba(129,199,132,0.5); }
+
+.btn-complete {
+  background: transparent;
+  border: 1px solid rgba(77,217,138,0.35);
+  color: #4dd98a;
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.btn-complete:hover { background: rgba(77,217,138,0.1); border-color: rgba(77,217,138,0.5); }
+
 .btn-delete-service {
   background: transparent;
   border: 1px solid rgba(229,115,115,0.3);

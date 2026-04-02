@@ -84,6 +84,32 @@
   color: rgba(255,255,255,0.35);
 }
 
+/* MAP VIEW TOGGLE */
+.map-toggle-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: -1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.btn-map-toggle {
+  background: transparent;
+  border: 1px solid rgba(37,168,101,0.3);
+  color: rgba(255,255,255,0.6);
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, transform 0.1s;
+}
+
+.btn-map-toggle:hover {
+  border-color: #25a865;
+  color: #25a865;
+  transform: translateY(-1px);
+}
+
 /* GRIGLIA */
 .services-grid {
   display: grid;

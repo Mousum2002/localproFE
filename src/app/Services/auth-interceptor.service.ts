@@ -11,10 +11,11 @@ export const sessionInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-        //è un po troppo agressivo
+        // Sessione scaduta: sincronizziamo lo stato UI e reindirizziamo al login.
       if (error.status === 401) {
         localStorage.removeItem('user');
-        inject(AuthService).user.next(null);
+        sessionStorage.removeItem('user');
+        inject(AuthService).setSession(null);
         inject(Router).navigate(['/login'], {
           queryParams: { reason: 'session_expired' }
         });

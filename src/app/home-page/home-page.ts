@@ -1,6 +1,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { OperationService } from '../Services/operations.service';
 import { OperationType } from '../model/entities';
 
 @Component({
@@ -14,16 +14,14 @@ export class HomePage implements OnInit {
   operationTypes = signal<OperationType[]>([]);
   totalServices   = signal<number>(0);
 
-  constructor(private http: HttpClient) {}
+  constructor(private operations: OperationService) {}
 
   ngOnInit() {
-
-    this.http.get<any[]>('http://localhost:8089/public/allOperationList')
-    .subscribe(operations => {
+    this.operations.fetchAllOperations().subscribe((operations) => {
       // Imposta il totale basandoti sulla lunghezza dell'array ricevuto
       this.totalServices.set(operations.length);
 
-      const preview = operations.slice(0, 6);
+      const preview = operations.slice(0, 6) as unknown as OperationType[];
       this.operationTypes.set(preview);
     });
   }

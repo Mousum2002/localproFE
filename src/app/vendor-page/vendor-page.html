@@ -59,7 +59,7 @@
 
               @if (!isOwnProfile) {
                 @if (auth.isLoggedIn()) {
-                  <button class="btn-book" (click)="bookService(svc.id)">Prenota</button>
+                  <button class="btn-book" (click)="openBooking(svc)">Prenota</button>
                 } @else {
                   <a routerLink="/login" class="btn-book-login">Accedi per prenotare</a>
                 }
@@ -148,3 +148,72 @@
   }
 
 </div>
+
+<!-- ===================== MODAL PRENOTAZIONE ===================== -->
+@if (bookingModal()) {
+  <div class="modal-overlay" (click)="closeBooking()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+
+      <button class="modal-close" (click)="closeBooking()">✕</button>
+
+      @if (bookingSuccess()) {
+        <div class="booking-success">
+          <div class="success-icon">✓</div>
+          <h2 class="success-title">Prenotazione effettuata!</h2>
+          <p class="success-sub">
+            Trovi la prenotazione nel tuo profilo.
+          </p>
+          <button class="btn-book-modal" (click)="closeBooking()">Chiudi</button>
+        </div>
+      } @else {
+        <div class="booking-header">
+          <div class="booking-avatar">{{ bookingModal().category?.[0]?.toUpperCase() ?? '?' }}</div>
+          <div>
+            <div class="booking-category">{{ bookingModal().category }}</div>
+            <div class="booking-vendor">con {{ vendor()?.userName }}</div>
+            @if (vendor()?.city) {
+              <div class="booking-city">📍 {{ vendor()?.city }}</div>
+            }
+          </div>
+          <div class="booking-price">{{ bookingModal().price }}€</div>
+        </div>
+
+        <div class="modal-divider"></div>
+
+        <h3 class="modal-section-title">Quando preferisci il servizio?</h3>
+
+        <div class="booking-form">
+          <div class="form-group-modal">
+            <label class="form-label-modal">Data e ora *</label>
+            <input class="form-input-modal"
+              type="datetime-local"
+              [(ngModel)]="bookingDate"
+              [min]="minDate"
+              (change)="bookingError.set('')" />
+          </div>
+
+          <div class="form-group-modal">
+            <label class="form-label-modal">Note (opzionale)</label>
+            <textarea class="form-input-modal"
+              rows="3"
+              placeholder="Descrivi eventuali dettagli utili per il professionista..."
+              [(ngModel)]="bookingNote"
+              maxlength="300"></textarea>
+          </div>
+
+          @if (bookingError()) {
+            <p class="booking-error">❌ {{ bookingError() }}</p>
+          }
+
+          <button class="btn-book-modal"
+            (click)="confirmBooking()"
+            [disabled]="bookingLoading()">
+            @if (bookingLoading()) { Prenotazione in corso... }
+            @else { Conferma prenotazione }
+          </button>
+        </div>
+      }
+
+    </div>
+  </div>
+}

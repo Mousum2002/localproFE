@@ -2,7 +2,10 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Auth } from '../auth';
+import { AuthService } from '../Services/auth.service';
+import { environment } from '../../environments/environment';
+import { PrenotazioneService } from '../Services/pernotazione.service';
+import { SnackbarService } from '../Services/snackbar.service';
 
 @Component({
   selector: 'app-vendor-page',
@@ -24,14 +27,29 @@ export class VendorPage implements OnInit {
   reviewError    = signal('');
   hoveredStar    = 0;
 
+  // --- MODAL PRENOTAZIONE ---
+  bookingModal   = signal<any | null>(null); // servizio selezionato
+  bookingDate    = '';
+  bookingNote    = '';
+  bookingLoading = signal(false);
+  bookingSuccess = signal(false);
+  bookingError   = signal('');
+
+  // data minima = oggi
+  get minDate(): string {
+    return new Date().toISOString().slice(0, 16);
+  }
+
   private vendorId = 0;
-  private baseUrl  = 'http://localhost:8080';
+  private baseUrl  = environment.apiUrl;
 
   constructor(
     private route: ActivatedRoute,
     public router: Router,
     private http: HttpClient,
-    public auth: Auth
+    public auth: AuthService,
+    private prenotazioneService: PrenotazioneService,
+    private snackbar: SnackbarService
   ) {}
 
   ngOnInit() {
@@ -48,13 +66,50 @@ export class VendorPage implements OnInit {
       });
   }
 
-  bookService(serviceId: number) {
-    if (!this.auth.isLoggedIn()) { this.router.navigate(['/login']); return; }
-    this.http.post(`${this.baseUrl}/api/prenotazioni`, { serviceId, note: '' }, { withCredentials: true })
-      .subscribe({
-        next:  () => alert('Prenotazione effettuata con successo!'),
-        error: () => alert('Errore durante la prenotazione. Riprova.'),
-      });
+  openBooking(service: any) {
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.bookingModal.set(service);
+    this.bookingDate = '';
+    this.bookingNote = '';
+    this.bookingError.set('');
+    this.bookingSuccess.set(false);
+  }
+
+  closeBooking() {
+    this.bookingModal.set(null);
+    this.bookingSuccess.set(false);
+  }
+
+  confirmBooking() {
+    if (!this.bookingDate) {
+      this.bookingError.set('Seleziona una data per il servizio.');
+      return;
+    }
+    const svc = this.bookingModal();
+    if (!svc) return;
+
+    this.bookingLoading.set(true);
+    this.bookingError.set('');
+
+    this.prenotazioneService.createPrenotazione({
+      serviceId: svc.id,
+      note: this.bookingNote,
+      reservationDate: new Date(this.bookingDate).toISOString().slice(0, 19),
+    }).subscribe({
+      next: () => {
+        this.bookingLoading.set(false);
+        this.bookingSuccess.set(true);
+        this.snackbar.show('Prenotazione effettuata con successo!', 'success');
+      },
+      error: () => {
+        this.bookingLoading.set(false);
+        this.bookingError.set('Errore durante la prenotazione. Riprova.');
+        this.snackbar.show('Errore durante la prenotazione. Riprova.', 'error');
+      }
+    });
   }
 
   submitReview() {
@@ -94,8 +149,9 @@ export class VendorPage implements OnInit {
         next: () => {
           const v = this.vendor();
           if (v) this.vendor.set({ ...v, reviews: v.reviews.filter((r: any) => r.id !== reviewId) });
+          this.snackbar.show('Recensione eliminata.', 'success');
         },
-        error: () => alert('Impossibile eliminare la recensione.')
+        error: () => this.snackbar.show('Impossibile eliminare la recensione.', 'error')
       });
   }
 

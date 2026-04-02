@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { PortalUser } from './model/entities';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
   private http = inject(HttpClient);
-  private adminUrl = 'http://localhost:8089/admin';
+  private adminUrl = `${environment.apiUrl}/admin`;
 
   /**
    * Recupera tutti gli utenti per la dashboard
@@ -39,6 +40,6 @@ export class AdminService {
 
   public deleteUser(userId: number): Observable<void> {
     // Nota: aggiungiamo withCredentials se il backend è protetto
-    return this.http.delete<void>(`http://localhost:8089/admin/delete/${userId}`, { withCredentials: true });
+    return this.http.delete<void>(`${this.adminUrl}/delete/${userId}`, { withCredentials: true });
   }
 }

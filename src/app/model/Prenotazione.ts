@@ -1,7 +1,10 @@
 export interface PrenotazioneRequest {
     serviceId: number;
     note: string;
-    dateTime: string;
+    // Supporta entrambi i nomi campo usati lato frontend/back-end.
+    // Il backend sembra aspettarsi `reservationDate`, ma in alcuni punti veniva usato `dateTime`.
+    reservationDate?: string;
+    dateTime?: string;
 }
 
 export interface PrenotazioneResponse{
