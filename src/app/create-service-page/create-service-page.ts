@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { OperationService } from '../Services/operations.service';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../Services/auth.service';
+import { SnackbarService } from '../Services/snackbar.service';
 
 interface OperationType {
   id: number;
@@ -42,7 +43,8 @@ export class CreateServicePage implements OnInit {
     private http: HttpClient,
     private router: Router,
     public auth: AuthService,
-    private operations: OperationService
+    private operations: OperationService,
+    private snackbar: SnackbarService
   ) {}
 
   ngOnInit() {
@@ -126,11 +128,13 @@ export class CreateServicePage implements OnInit {
       next: () => {
         this.loading.set(false);
         this.success.set(true);
+        this.snackbar.show('Servizio pubblicato con successo!', 'success');
         setTimeout(() => this.router.navigate(['/servizi']), 2000);
       },
       error: () => {
         this.loading.set(false);
         this.error.set('Errore pubblicazione.');
+        this.snackbar.show('Errore pubblicazione servizio.', 'error');
       }
     });
   }

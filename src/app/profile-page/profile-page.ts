@@ -9,6 +9,7 @@ import { PrenotazioneService } from '../Services/pernotazione.service';
 import { ReviewService } from '../Services/review.service';
 import { LocationService } from '../Services/localtion-service';
 import { of, switchMap, catchError } from 'rxjs';
+import { SnackbarService } from '../Services/snackbar.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -54,7 +55,6 @@ export class ProfilePage implements OnInit {
 
   private apiBase      = environment.apiUrl;
   private usersUrl    = `${this.apiBase}/api/users`;
-  private bookingsUrl = `${this.apiBase}/api/prenotazioni`;
   private vendorUrl   = `${this.apiBase}/api/vendor-operations`;
   private opTypesUrl  = `${this.apiBase}/public/operation-types`;
 
@@ -67,7 +67,8 @@ export class ProfilePage implements OnInit {
     private prenotazioneService: PrenotazioneService,
     private reviewService: ReviewService,
     private operations: OperationService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private snackbar: SnackbarService
   ) {}
 
   ngOnInit() {
@@ -105,7 +106,9 @@ export class ProfilePage implements OnInit {
         this.myBookings.update((list) =>
           list.map((b) => (b.id === id ? { ...b, status: 'Cancellata' } : b)),
         );
+        this.snackbar.show('Prenotazione annullata.', 'success');
       },
+      error: () => this.snackbar.show('Errore durante annullamento prenotazione.', 'error'),
     });
   }
 
@@ -123,9 +126,10 @@ export class ProfilePage implements OnInit {
         this.incomingBookings.update((list) =>
           list.map((b) => (b.id === id ? { ...b, status } : b)),
         );
+        this.snackbar.show('Stato prenotazione aggiornato.', 'success');
       },
       error: () => {
-        // Keep UI unchanged on error.
+        this.snackbar.show('Errore durante aggiornamento stato.', 'error');
       },
       complete: () => this.incomingActionLoadingId.set(null),
     });
@@ -236,7 +240,13 @@ export class ProfilePage implements OnInit {
 
   deleteService(id: number) {
     if (!confirm('Eliminare questo servizio?')) return;
-    this.operations.deleteOperation(id).subscribe(() => this.loadMyServices());
+    this.operations.deleteOperation(id).subscribe({
+      next: () => {
+        this.loadMyServices();
+        this.snackbar.show('Servizio eliminato.', 'success');
+      },
+      error: () => this.snackbar.show('Errore durante eliminazione servizio.', 'error'),
+    });
   }
 
   startEdit(service: any) {
@@ -263,8 +273,12 @@ export class ProfilePage implements OnInit {
             : s
           )
         );
+        this.snackbar.show('Servizio aggiornato.', 'success');
       },
-      error: () => { this.editSaving.set(false); }
+      error: () => {
+        this.editSaving.set(false);
+        this.snackbar.show('Errore durante aggiornamento servizio.', 'error');
+      }
     });
   }
 
@@ -352,12 +366,14 @@ export class ProfilePage implements OnInit {
 
           this.previewUrl = null;
           this.profileImageUrl = updated.profileImage;
+          this.snackbar.show('Profilo aggiornato con successo!', 'success');
 
           setTimeout(() => this.success.set(false), 3000);
         },
         error: () => {
           this.loading.set(false);
           this.error.set('Salvataggio fallito. Riprova.');
+          this.snackbar.show('Salvataggio profilo fallito.', 'error');
         },
       });
   }

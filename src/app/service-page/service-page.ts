@@ -6,6 +6,7 @@ import { OperationService } from '../Services/operations.service';
 import { OperationListItem } from '../model/Operations';
 import { MapService } from '../Services/map-service';
 import { PrenotazioneService } from '../Services/pernotazione.service';
+import { SnackbarService } from '../Services/snackbar.service';
 
 @Component({
   selector: 'app-service-page',
@@ -43,7 +44,8 @@ export class ServicePage implements OnInit {
     public auth: AuthService,
     private router: Router,
     private mapService: MapService,
-    private prenotazioneService: PrenotazioneService
+    private prenotazioneService: PrenotazioneService,
+    private snackbar: SnackbarService
   ) {}
 
   ngOnInit() {
@@ -116,10 +118,12 @@ export class ServicePage implements OnInit {
       next: () => {
         this.bookingLoading.set(false);
         this.bookingSuccess.set(true);
+        this.snackbar.show('Prenotazione effettuata con successo!', 'success');
       },
       error: () => {
         this.bookingLoading.set(false);
         this.bookingError.set('Errore durante la prenotazione. Riprova.');
+        this.snackbar.show('Errore durante la prenotazione. Riprova.', 'error');
       }
     });
   }

@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../Services/auth.service';
+import { SnackbarService } from '../Services/snackbar.service';
 
 @Component({
   selector: 'app-login-page',
@@ -17,7 +18,7 @@ export class LoginPage {
   error = signal<string>('');
   loading = signal<boolean>(false);
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router, private snackbar: SnackbarService) {}
 
   login() {
     if (!this.userName || !this.password) {
@@ -31,6 +32,7 @@ export class LoginPage {
     this.auth.login(this.userName, this.password).subscribe({
       next: () => {
         this.loading.set(false);
+        this.snackbar.show('Accesso effettuato.', 'success');
         this.router.navigate(['/']);  // naviga solo se login ok
       },
       error: (e) => {
@@ -41,6 +43,7 @@ export class LoginPage {
         } else {
           this.error.set('Errore di connessione. Riprova.');
         }
+        this.snackbar.show(this.error(), 'error');
       }
     });
   }

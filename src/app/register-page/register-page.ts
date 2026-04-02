@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 import { LocationService } from '../Services/localtion-service';
 import { of, switchMap, catchError } from 'rxjs';
 import { AuthService, LoggedUser } from '../Services/auth.service';
+import { SnackbarService } from '../Services/snackbar.service';
 
 
 @Component({
@@ -36,7 +37,8 @@ export class RegisterPage {
     private http: HttpClient,
     private router: Router,
     private locationService: LocationService,
-    private auth: AuthService
+    private auth: AuthService,
+    private snackbar: SnackbarService
   ) {}
 
   register() {
@@ -91,12 +93,14 @@ export class RegisterPage {
 
             // Usa la response del backend per considerare l'utente loggato
             this.auth.setSession(user);
+            this.snackbar.show('Registrazione completata con successo!', 'success');
 
             this.router.navigate(['/']);
           },
           error: () => {
             this.loading.set(false);
             this.error.set('Registrazione fallita. Username o email già in uso.');
+            this.snackbar.show(this.error(), 'error');
           },
         });
       });
